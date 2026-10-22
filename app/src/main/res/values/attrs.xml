@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Theme attributes for the text styles Material has no role for.
+     Layouts use them like any other role: android:textAppearance="?attr/textAppearanceStat". -->
+<resources>
+    <attr name="textAppearanceTicketNumber" format="reference" />
+    <attr name="textAppearanceTicketNumberCalled" format="reference" />
+    <attr name="textAppearanceTicketNumberCounter" format="reference" />
+    <attr name="textAppearanceStat" format="reference" />
+    <attr name="textAppearanceStatHero" format="reference" />
+    <attr name="textAppearanceFieldLabel" format="reference" />
+    <attr name="textAppearanceStatSmall" format="reference" />
+    <attr name="textAppearanceStatDisplay" format="reference" />
+    <attr name="textAppearanceTicketNumberLarge" format="reference" />
+    <attr name="textAppearanceTicketNumberSmall" format="reference" />
+    <attr name="textAppearanceMonoSmall" format="reference" />
+
+    <!-- TearLineView: the dashed crema line -->
+    <declare-styleable name="TearLineView">
+        <attr name="tearOrientation" format="enum">
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
+        <attr name="tearColor" format="color" />
+        <!-- dashed: the crema tear line. dotted: the leader in a receipt slip row. -->
+        <attr name="tearStyle" format="enum">
+            <enum name="dashed" value="0" />
+            <enum name="dotted" value="1" />
+        </attr>
+    </declare-styleable>
+<attr name="quappMotionSpec" format="reference" />
+</resources>

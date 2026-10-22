@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Queue card v7, a catalogue card (DESIGN.md "Queue card"), shared by Browse and the owner's
+     Queues tab: category and number with the status stamped beside them, the name in serif over
+     a double rule, then Where / What / When / Wait written on ruled lines, and a punched hole.
+     QueueCards.bind fills it; the queuer and organizer versions differ only in the last line. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/card_gap"
+    android:background="@drawable/bg_index_card"
+    android:clickable="true"
+    android:clipChildren="false"
+    android:elevation="@dimen/card_elevation"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/space_md"
+    android:paddingTop="@dimen/space_md"
+    android:paddingEnd="@dimen/space_md"
+    android:paddingBottom="@dimen/space_ms">
+
+    <!-- 1. Category and number, the status stamped at the end -->
+    <!-- clipChildren off: the tilted stamp's corners reach past its own box -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/card_serial"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            tools:text="Relief · No. 001" />
+
+        <!-- The stamp's double-ruled outline is set in code (TicketShapes.stampBackground) -->
+        <TextView
+            android:id="@+id/card_status"
+            style="@style/Widget.Quapp.Stamp.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xs"
+            android:layout_marginEnd="@dimen/space_xs"
+            tools:text="Open"
+            tools:textColor="@color/ok" />
+    </LinearLayout>
+
+    <!-- 2. The name, and the verified badge -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_xs"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/card_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            tools:text="Barangay Relief Distribution" />
+
+        <ImageView
+            android:id="@+id/card_verified"
+            android:layout_width="@dimen/icon_small"
+            android:layout_height="@dimen/icon_small"
+            android:layout_marginStart="@dimen/space_sm"
+            android:contentDescription="@string/detail_verified"
+            android:src="@drawable/ic_badge_check"
+            app:tint="@color/ok" />
+    </LinearLayout>
+
+
+
+    <!-- 3. The details, one per ruled line -->
+    <include
+        android:id="@+id/card_row_where"
+        layout="@layout/view_card_row" />
+
+    <include
+        android:id="@+id/card_row_what"
+        layout="@layout/view_card_row" />
+
+    <include
+        android:id="@+id/card_row_when"
+        layout="@layout/view_card_row" />
+
+    <include
+        android:id="@+id/card_row_wait"
+        layout="@layout/view_card_row" />
+
+    <!-- Open Browse cards separate the decision-driving wait from supporting queue details. -->
+    <LinearLayout
+        android:id="@+id/card_wait_hero"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        
+        android:orientation="vertical"
+        android:paddingTop="@dimen/space_xs"
+        android:paddingBottom="@dimen/space_xs"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/TextAppearance.Quapp.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/card_label_wait"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <TextView
+            android:id="@+id/card_wait_value"
+            style="@style/TextAppearance.Quapp.StatHero"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnSurface"
+            tools:text="55 min" />
+
+        <TextView
+            android:id="@+id/card_wait_details"
+            style="@style/TextAppearance.Quapp.MonoSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            tools:text="42 in line · serving #21" />
+    </LinearLayout>
+
+    <!-- 4. The punched hole a catalogue card hangs on -->
+
+</LinearLayout>

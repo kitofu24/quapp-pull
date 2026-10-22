@@ -1,0 +1,150 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Civic Paper, light only (DESIGN.md section 2). Layouts use these roles, never the colours. -->
+    <style name="Theme.Quapp" parent="Theme.Material3Expressive.DayNight.NoActionBar">
+        <!-- Ink on paper is the default action: the primary is not a brand hue -->
+        <!-- Textures every Material component as it's inflated (QuappViewInflater, Grain) -->
+        <item name="viewInflaterClass">com.example.quapp.QuappViewInflater</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+
+        <item name="colorSecondary">@color/ink_muted</item>
+        <item name="colorOnSecondary">@color/paper_raised</item>
+        <!-- Chips, the nav indicator and tonal buttons -->
+        <item name="colorSecondaryContainer">@color/paper_sunk</item>
+        <item name="colorOnSecondaryContainer">@color/ink</item>
+
+        <!-- Links and text buttons -->
+        <item name="colorTertiary">@color/roast</item>
+        <item name="colorOnTertiary">@color/paper_raised</item>
+
+        <!-- Surfaces: paper is the ground, raised is a card, sunk is a well -->
+        <item name="android:colorBackground">@color/paper</item>
+        <item name="colorOnBackground">@color/ink</item>
+        <item name="colorSurface">@color/paper</item>
+        <item name="colorOnSurface">@color/ink</item>
+        <item name="colorSurfaceVariant">@color/paper_sunk</item>
+        <item name="colorOnSurfaceVariant">@color/ink_muted</item>
+        <item name="colorSurfaceContainerLowest">@color/paper_raised</item>
+        <item name="colorSurfaceContainerLow">@color/paper_raised</item>
+        <item name="colorSurfaceContainer">@color/paper_raised</item>
+        <item name="colorSurfaceContainerHigh">@color/paper_sunk</item>
+        <item name="colorSurfaceContainerHighest">@color/paper_sunk</item>
+
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">@color/line</item>
+
+        <item name="colorError">@color/err</item>
+        <item name="colorOnError">@color/on_err</item>
+        <item name="colorErrorContainer">@color/err_soft</item>
+        <item name="colorOnErrorContainer">@color/err</item>
+
+        <!-- Type: every Material role points at a Civic Paper style (values/type.xml) -->
+        <!-- A TextView with no textAppearance reads as body text. Not a theme-wide fontFamily:
+             that would beat every textAppearance and turn the serif headlines into Plex. -->
+        <item name="android:textViewStyle">@style/Widget.Quapp.TextView</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Quapp.TicketNumber</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Quapp.Display</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Quapp.Display</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Quapp.Display</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Quapp.Display</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Quapp.Title</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Quapp.Title</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Quapp.HeadingSmall</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Quapp.ListPrimary</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Quapp.Body</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Quapp.Body</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Quapp.Caption</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Quapp.Button</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Quapp.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Quapp.Label</item>
+        <item name="textAppearanceTicketNumber">@style/TextAppearance.Quapp.TicketNumber</item>
+        <item name="textAppearanceTicketNumberCalled">@style/TextAppearance.Quapp.TicketNumber.Called</item>
+        <item name="textAppearanceTicketNumberCounter">@style/TextAppearance.Quapp.TicketNumber.Counter</item>
+        <item name="textAppearanceStat">@style/TextAppearance.Quapp.Stat</item>
+        <item name="textAppearanceStatHero">@style/TextAppearance.Quapp.StatHero</item>
+        <item name="textAppearanceFieldLabel">@style/TextAppearance.Quapp.FieldLabel</item>
+        <item name="textAppearanceStatSmall">@style/TextAppearance.Quapp.StatSmall</item>
+        <item name="textAppearanceStatDisplay">@style/TextAppearance.Quapp.StatDisplay</item>
+        <item name="textAppearanceTicketNumberLarge">@style/TextAppearance.Quapp.TicketNumber.Large</item>
+        <item name="textAppearanceTicketNumberSmall">@style/TextAppearance.Quapp.TicketNumber.Small</item>
+        <item name="textAppearanceMonoSmall">@style/TextAppearance.Quapp.MonoSmall</item>
+
+        <!-- Components (values/styles.xml): every MaterialButton gets the Civic Paper shape -->
+        <item name="materialButtonStyle">@style/Widget.Quapp.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Quapp.Button.Outlined</item>
+        <item name="borderlessButtonStyle">@style/Widget.Quapp.Button.Text</item>
+        <item name="snackbarStyle">@style/Widget.Quapp.Snackbar</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.Quapp.BottomSheetDialog</item>
+        <item name="snackbarTextViewStyle">@style/Widget.Quapp.Snackbar.Text</item>
+        <item name="snackbarButtonStyle">@style/Widget.Quapp.Snackbar.Action</item>
+
+        <!-- Paper with its printed grain, behind every screen -->
+        <item name="android:windowBackground">@drawable/bg_paper</item>
+
+        <!-- Clear bars, so the textured window background shows under them on every Android version
+             (15 and up ignore the colours anyway), with dark icons on the paper. No grey veil over
+             the nav bar either. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">@bool/light_system_bars</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="29">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">@bool/light_system_bars</item>
+    </style>
+
+    <!-- Splash: plain paper while the app starts (the ticket mark arrives with the logo step) -->
+    <style name="Theme.Quapp.Splash" parent="Theme.Quapp" />
+
+    <!-- The spotlight: put android:theme="@style/ThemeOverlay.Quapp.Spotlight" on the espresso view and
+         every Material component inside picks up the dark colours by itself. -->
+    <style name="ThemeOverlay.Quapp.Spotlight" parent="ThemeOverlay.Material3">
+        <!-- Plain TextViews with no colour of their own read these, not colorOnSurface -->
+        <item name="android:textColorPrimary">@color/on_spotlight</item>
+        <item name="android:textColorSecondary">@color/on_spotlight_muted</item>
+        <item name="colorPrimary">@color/on_spotlight</item>
+        <item name="colorOnPrimary">@color/spotlight</item>
+        <item name="colorSecondaryContainer">@color/spotlight_line</item>
+        <item name="colorOnSecondaryContainer">@color/on_spotlight</item>
+        <item name="colorTertiary">@color/crema</item>
+        <item name="colorSurface">@color/spotlight</item>
+        <item name="colorOnSurface">@color/on_spotlight</item>
+        <item name="colorSurfaceVariant">@color/spotlight_line</item>
+        <item name="colorOnSurfaceVariant">@color/on_spotlight_muted</item>
+        <item name="colorSurfaceContainerLow">@color/spotlight</item>
+        <item name="colorSurfaceContainer">@color/spotlight</item>
+        <item name="colorSurfaceContainerHigh">@color/spotlight_line</item>
+        <item name="colorOutline">@color/on_spotlight_muted</item>
+        <item name="colorOutlineVariant">@color/spotlight_line</item>
+        <item name="colorError">@color/err_on_spotlight</item>
+    </style>
+
+    <!-- The Called screen: the whole ground turns espresso, light bar icons -->
+    <style name="Theme.Quapp.Called" parent="Theme.Quapp">
+        <!-- Plain TextViews with no colour of their own read these, not colorOnSurface -->
+        <item name="android:textColorPrimary">@color/on_spotlight</item>
+        <item name="android:textColorSecondary">@color/on_spotlight_muted</item>
+        <item name="android:windowBackground">@drawable/bg_spotlight</item>
+        <item name="android:colorBackground">@color/spotlight</item>
+        <item name="colorPrimary">@color/on_spotlight</item>
+        <item name="colorOnPrimary">@color/spotlight</item>
+        <item name="colorTertiary">@color/crema</item>
+        <item name="colorSurface">@color/spotlight</item>
+        <item name="colorOnSurface">@color/on_spotlight</item>
+        <item name="colorSurfaceContainerLowest">@color/spotlight</item>
+        <item name="colorSurfaceContainerLow">@color/spotlight</item>
+        <item name="colorSurfaceContainer">@color/spotlight</item>
+        <item name="colorSurfaceContainerHigh">@color/spotlight_line</item>
+        <item name="colorSurfaceContainerHighest">@color/spotlight_line</item>
+        <item name="colorSurfaceVariant">@color/spotlight_line</item>
+        <item name="colorOnSurfaceVariant">@color/on_spotlight_muted</item>
+        <item name="colorOutline">@color/on_spotlight_muted</item>
+        <item name="colorOutlineVariant">@color/spotlight_line</item>
+        <item name="colorError">@color/err_on_spotlight</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+    </style>
+</resources>

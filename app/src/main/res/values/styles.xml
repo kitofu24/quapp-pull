@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Component styles for Civic Paper (DESIGN.md section 9). -->
+<resources>
+
+    <!-- Default for every TextView (android:textViewStyle in Theme.Quapp) -->
+    <style name="Widget.Quapp.TextView" parent="Widget.AppCompat.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Quapp.Body</item>
+    </style>
+
+    <!-- Bottom nav: raised paper, ink when selected. The tear line above it is a TearLineView
+         in the layout; the notched active tab is set in code (TicketShapes.selection). -->
+    <style name="Widget.Quapp.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">?attr/colorSurfaceContainer</item>
+        <item name="elevation">0dp</item>
+        <item name="itemIconSize">22dp</item>
+        <item name="itemIconTint">@color/nav_item</item>
+        <item name="itemTextColor">@color/nav_item</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.Quapp.NavLabel.Active</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.Quapp.NavLabel</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.Quapp.BottomNavigation.Indicator</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <!-- The active tab: a 64 x 32 paper_sunk ticket -->
+    <style name="Widget.Quapp.BottomNavigation.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">?attr/colorSecondaryContainer</item>
+        <item name="android:width">64dp</item>
+        <item name="android:height">32dp</item>
+    </style>
+
+    <style name="TextAppearance.Quapp.NavLabel" parent="TextAppearance.Quapp.LabelMedium" />
+
+    <style name="TextAppearance.Quapp.NavLabel.Active">
+        <item name="fontFamily">@font/ibm_plex_sans_bold</item>
+        <item name="android:fontFamily">@font/ibm_plex_sans_bold</item>
+    </style>
+    <!-- Expressive buttons: pill shape, 56dp primary / 48dp supporting minimum. -->
+
+    <style name="ShapeAppearance.Quapp.Button" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/radius_card</item>
+    </style>
+
+    <!-- Filled: ink with paper_raised text (colorPrimary / colorOnPrimary). One per screen. -->
+    <style name="Widget.Quapp.Button" parent="Widget.Material3.Button">
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Button</item>
+        <!-- M3 pads 6dp above and below the visible button; Civic Paper buttons fill their height -->
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">@dimen/button_height_lg</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:minWidth">@dimen/touch_target_min</item>
+        <item name="android:paddingStart">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/control_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/control_padding_vertical</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="iconSize">@dimen/icon_small</item>
+        <item name="iconPadding">@dimen/control_icon_gap</item>
+    </style>
+
+    <!-- Tonal: paper_sunk with ink text (colorSecondaryContainer) -->
+    <style name="Widget.Quapp.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Button</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:minWidth">@dimen/touch_target_min</item>
+        <item name="android:paddingStart">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/control_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/control_padding_vertical</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="iconSize">@dimen/icon_small</item>
+        <item name="iconPadding">@dimen/control_icon_gap</item>
+    </style>
+
+    <!-- Outlined: 1dp outline with ink text -->
+    <style name="Widget.Quapp.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Button</item>
+        <item name="android:textColor">@color/button_outline_text</item>
+        <item name="iconTint">@color/button_outline_text</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:minWidth">@dimen/touch_target_min</item>
+        <item name="android:paddingStart">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/control_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/control_padding_vertical</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="iconSize">@dimen/icon_small</item>
+        <item name="iconPadding">@dimen/control_icon_gap</item>
+    </style>
+
+    <!-- Text: roast. The overlay swaps the primary for this button only, so the ripple matches. -->
+    <style name="Widget.Quapp.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Button</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Quapp.TextButton</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:minWidth">@dimen/touch_target_min</item>
+        <item name="android:paddingStart">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/control_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/control_padding_vertical</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="iconSize">@dimen/icon_small</item>
+        <item name="iconPadding">@dimen/control_icon_gap</item>
+    </style>
+
+    <!-- Text button with a leading icon -->
+    <style name="Widget.Quapp.Button.Text.Icon" parent="Widget.Material3.Button.TextButton.Icon">
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Button</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Quapp.TextButton</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:gravity">center</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:minWidth">@dimen/touch_target_min</item>
+        <item name="android:paddingStart">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/control_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/control_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/control_padding_vertical</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="iconSize">@dimen/icon_small</item>
+        <item name="iconPadding">@dimen/control_icon_gap</item>
+    </style>
+
+    <style name="ThemeOverlay.Quapp.TextButton" parent="ThemeOverlay.Material3.Button.TextButton">
+        <item name="colorPrimary">@color/primary_text</item>
+    </style>
+
+    <!-- ===== Fields (DESIGN.md section 9): label above in its own TextView, 52dp paper_raised box ===== -->
+
+    <style name="Widget.Quapp.TextField" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <!-- The label is a TextView above the box, so no floating hint -->
+        <item name="hintEnabled">false</item>
+        <item name="boxBackgroundColor">?attr/colorSurfaceContainer</item>
+        <item name="boxStrokeColor">?attr/colorOutline</item>
+        <item name="boxStrokeWidth">@dimen/hairline</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="boxStrokeErrorColor">?attr/colorError</item>
+        <item name="boxCornerRadiusTopStart">@dimen/radius_card</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/radius_card</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/radius_card</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/radius_card</item>
+        <item name="helperTextTextAppearance">@style/TextAppearance.Quapp.Caption</item>
+        <item name="errorTextAppearance">@style/TextAppearance.Quapp.Caption</item>
+        <item name="endIconTint">?attr/colorOnSurfaceVariant</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Quapp.TextField</item>
+    </style>
+
+    <style name="ThemeOverlay.Quapp.TextField" parent="ThemeOverlay.Material3.TextInputEditText.OutlinedBox">
+        <item name="editTextStyle">@style/Widget.Quapp.TextField.Input</item>
+    </style>
+
+    <style name="Widget.Quapp.TextField.Input" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="android:textAppearance">@style/TextAppearance.Quapp.Input</item>
+        <item name="android:textColorHint">@color/ink_faint</item>
+        <item name="android:minHeight">@dimen/field_height</item>
+        <item name="android:paddingTop">@dimen/space_ms</item>
+        <item name="android:paddingBottom">@dimen/space_ms</item>
+    </style>
+
+    <!-- ===== Dock (bottom button bar): paper, 12dp/16dp padding. The tear line on top is a
+         TearLineView in the layout. ===== -->
+
+    <style name="Widget.Quapp.Dock" parent="">
+        <item name="android:paddingStart">@dimen/space_md</item>
+        <item name="android:paddingEnd">@dimen/space_md</item>
+        <item name="android:paddingTop">@dimen/space_ms</item>
+        <item name="android:paddingBottom">@dimen/space_ms</item>
+    </style>
+    <!-- ===== Card (DESIGN.md section 9): paper_raised, 1dp line, radius_md, flat ===== -->
+
+    <style name="Widget.Quapp.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainerHigh</item>
+        <item name="strokeColor">?attr/colorOutlineVariant</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="cardCornerRadius">@dimen/radius_card</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+    </style>
+    <!-- Call: marigold on the spotlight only. "I'm here" on the Called screen. -->
+    <style name="Widget.Quapp.Button.Call" parent="Widget.Quapp.Button">
+        <item name="backgroundTint">@color/signal</item>
+        <item name="android:textColor">@color/on_signal</item>
+        <item name="iconTint">@color/on_signal</item>
+        <item name="rippleColor">@color/on_signal</item>
+        <item name="android:textAppearance">@style/TextAppearance.Quapp.Button.Call</item>
+        <item name="android:minHeight">@dimen/button_height_xl</item>
+    </style>
+
+    <!-- The notification's own "I'm here": ordinary button size (canvas 20, 21) -->
+    <style name="Widget.Quapp.Button.Call.Small">
+        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+    </style>
+
+    <!-- Danger: filled error red, for an action that can't be undone ("Remove from line",
+         "Close and release 8"). It takes the place of the screen's filled button. -->
+    <style name="Widget.Quapp.Button.Danger" parent="Widget.Quapp.Button">
+        <item name="backgroundTint">?attr/colorError</item>
+        <item name="android:textColor">?attr/colorOnError</item>
+        <item name="iconTint">?attr/colorOnError</item>
+    </style>
+
+    <!-- Small tonal button inside a row ("Directions") -->
+    <style name="Widget.Quapp.Button.Tonal.Small">
+        <item name="android:paddingStart">@dimen/space_ms</item>
+        <item name="android:paddingEnd">@dimen/space_ms</item>
+        <item name="iconSize">@dimen/icon_small</item>
+        <item name="iconPadding">@dimen/space_xs</item>
+    </style>
+
+    <!-- Small mono tag on a console row ("WALK-IN") -->
+    <style name="Widget.Quapp.Tag" parent="">
+        <item name="android:background">@drawable/bg_pill</item>
+        <item name="android:backgroundTint">?attr/colorSurfaceVariant</item>
+        <item name="android:paddingStart">@dimen/space_sm</item>
+        <item name="android:paddingEnd">@dimen/space_sm</item>
+        <item name="android:paddingTop">@dimen/space_xs</item>
+        <item name="android:paddingBottom">@dimen/space_xs</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelSmall</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <!-- ===== Snackbar (DESIGN.md section 9): espresso, radius_sm, crema action ===== -->
+
+    <style name="Widget.Quapp.Snackbar" parent="Widget.Material3.Snackbar">
+        <item name="backgroundTint">@color/spotlight</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Snackbar</item>
+    </style>
+
+    <style name="ShapeAppearance.Quapp.Snackbar" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/radius_card</item>
+    </style>
+
+    <style name="Widget.Quapp.Snackbar.Text" parent="Widget.Material3.Snackbar.TextView">
+        <item name="android:textColor">@color/on_spotlight</item>
+    </style>
+
+    <style name="Widget.Quapp.Snackbar.Action" parent="Widget.Material3.Button.TextButton.Snackbar">
+        <item name="android:textColor">@color/crema</item>
+    </style>
+    <!-- Rubber stamp: tilted -6 degrees from its left edge. The colour and the double-rule
+         outline are set in code (TicketShapes.stampBackground). -->
+    <style name="Widget.Quapp.Stamp" parent="">
+        <item name="android:paddingStart">@dimen/space_ms</item>
+        <item name="android:paddingEnd">@dimen/space_ms</item>
+        <item name="android:paddingTop">@dimen/space_sm</item>
+        <item name="android:paddingBottom">@dimen/space_sm</item>
+        <item name="android:textAppearance">@style/TextAppearance.Quapp.Stamp</item>
+        <item name="android:rotation">-6</item>
+        <item name="android:transformPivotX">0dp</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- The stamp on a queue card: smaller, and tilted about its centre -->
+    <style name="Widget.Quapp.Stamp.Small">
+        <item name="android:paddingStart">@dimen/space_sm</item>
+        <item name="android:paddingEnd">@dimen/space_sm</item>
+        <item name="android:paddingTop">@dimen/space_xs</item>
+        <item name="android:paddingBottom">@dimen/space_xs</item>
+        <item name="android:textAppearance">?attr/textAppearanceLabelSmall</item>
+        <item name="android:rotation">0</item>
+    </style>
+
+    <!-- Tear-off stub dock: raised paper with notched top corners, where you're handed a number.
+         The background is set in code (TicketShapes.stubDockBackground). -->
+    <style name="Widget.Quapp.Dock.Stub">
+        <item name="android:paddingTop">@dimen/space_md</item>
+    </style>
+    <!-- ===== Select field: looks like a text field, opens a picker (dates, times, lists) ===== -->
+
+    <style name="Widget.Quapp.SelectField" parent="">
+        <item name="android:background">@drawable/bg_field</item>
+        <item name="android:minHeight">@dimen/field_height</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/space_md</item>
+        <item name="android:paddingEnd">@dimen/space_ms</item>
+        <item name="android:drawablePadding">@dimen/space_sm</item>
+        <item name="android:textAppearance">@style/TextAppearance.Quapp.Input</item>
+        <item name="android:textColorHint">@color/ink_faint</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="drawableTint">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <!-- ===== Segmented button (DESIGN.md): 44dp, pill ends, the selected segment ink ===== -->
+
+    <style name="Widget.Quapp.Segment" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="backgroundTint">@color/segment_background</item>
+        <item name="android:textColor">@color/segment_foreground</item>
+        <item name="iconTint">@color/segment_foreground</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:paddingStart">@dimen/space_sm</item>
+        <item name="android:paddingEnd">@dimen/space_sm</item>
+        <item name="iconPadding">@dimen/space_xs</item>
+        <item name="iconSize">@dimen/icon_small</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+    <!-- Six short choices in one row ("5" … "45"): no minimum width, so they share the space -->
+    <style name="Widget.Quapp.Segment.Compact">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+    </style>
+
+    <!-- ===== Bottom sheets (DESIGN.md "Sheets"): paper_raised, 16dp top corners, grab handle ===== -->
+
+    <style name="ThemeOverlay.Quapp.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Quapp.BottomSheet</item>
+    </style>
+
+    <style name="Widget.Quapp.BottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="backgroundTint">?attr/colorSurfaceContainer</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Sheet</item>
+    </style>
+
+    <style name="ShapeAppearance.Quapp.Sheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/radius_sheet</item>
+        <item name="cornerSizeTopRight">@dimen/radius_sheet</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+    <!-- ===== Chips (DESIGN.md "Chips"): 40dp, 1dp outline, pill; selected is ink with a check ===== -->
+
+    <style name="Widget.Quapp.Chip" parent="Widget.Material3.Chip.Filter">
+        <item name="chipBackgroundColor">@color/chip_background</item>
+        <item name="chipStrokeColor">@color/chip_stroke</item>
+        <item name="chipStrokeWidth">@dimen/hairline</item>
+        <item name="android:textColor">@color/chip_foreground</item>
+        <item name="chipIconTint">@color/chip_foreground</item>
+        <item name="checkedIconTint">@color/chip_foreground</item>
+        <item name="checkedIcon">@drawable/ic_check</item>
+        <item name="chipIconSize">@dimen/chip_icon_size</item>
+        <item name="checkedIconSize">@dimen/chip_icon_size</item>
+        <item name="chipMinHeight">40dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Pill</item>
+        <item name="android:textAppearance">@style/TextAppearance.Quapp.Chip</item>
+        <item name="ensureMinTouchTargetSize">true</item>
+    </style>
+
+    <!-- The town chip: paper_sunk, no edge, opens a picker instead of toggling -->
+    <style name="Widget.Quapp.Chip.Town" parent="Widget.Material3.Chip.Assist">
+        <item name="chipBackgroundColor">?attr/colorSurfaceVariant</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="chipIconTint">?attr/colorOnSurface</item>
+        <item name="closeIconTint">?attr/colorOnSurface</item>
+        <item name="chipIconSize">@dimen/chip_icon_size</item>
+        <item name="closeIconSize">@dimen/chip_icon_size</item>
+        <item name="chipMinHeight">40dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Pill</item>
+        <item name="android:textAppearance">@style/TextAppearance.Quapp.Chip</item>
+    </style>
+
+    <style name="ShapeAppearance.Quapp.Pill" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@fraction/radius_full</item>
+    </style>
+
+    <!-- "New queue": the extended FAB, ink with paper_raised text, radius_md like the buttons -->
+    <style name="Widget.Quapp.ExtendedFab" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
+        <item name="backgroundTint">@color/ink</item>
+        <item name="android:textColor">@color/paper_raised</item>
+        <item name="iconTint">@color/paper_raised</item>
+        <item name="rippleColor">@color/paper_raised</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Quapp.Button</item>
+        <item name="android:textAppearance">@style/TextAppearance.Quapp.Button</item>
+    </style>
+</resources>

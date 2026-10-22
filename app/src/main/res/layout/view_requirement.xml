@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One verification check on Queue detail: icon, name, what it means for you, and its state
+     (ON or PLANNED) as a small tag. Filled in by QueueDetailActivity.bindRule. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/space_ms"
+    android:paddingBottom="@dimen/space_ms">
+
+    <ImageView
+        android:id="@+id/requirement_icon"
+        android:layout_width="@dimen/icon_small"
+        android:layout_height="@dimen/icon_small"
+        android:importantForAccessibility="no"
+        tools:src="@drawable/ic_timer"
+        tools:tint="@color/ok" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_ms"
+        android:layout_marginEnd="@dimen/space_sm"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/requirement_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceTitleSmall"
+            tools:text="Presence confirmation" />
+
+        <TextView
+            android:id="@+id/requirement_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            tools:text="When called, tap &quot;I'm here&quot; within 3 minutes or your slot goes to the next person." />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/requirement_state"
+        style="@style/Widget.Quapp.Tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="On" />
+</LinearLayout>

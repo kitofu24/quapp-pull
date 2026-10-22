@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Browse, the queuer's home (canvas 05, 33, 34, 40, 41).
+
+     A CoordinatorLayout, not a ConstraintLayout, because the header has to move with the list:
+     the top part (title, greeting and the state card) scrolls away as you scroll down and comes
+     back at the top of the list; search, the chips and the count stay pinned, so filtering is
+     always one tap away. That leaves most of the screen to the queue cards.
+
+     The state card depends on the state:
+     - first visit (no town yet): the town question, then "Open now across Bohol"
+     - in line: the slim espresso "You're in line" banner (the screen's one spotlight)
+     - otherwise: the shortest wait in your town -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Opaque paper: the pinned part covers the cards scrolling under it. The textured ground,
+         lined up with the window's, is set in code (Grain.groundBehind) -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/browse_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/colorBackground"
+        app:elevation="0dp"
+        app:liftOnScroll="false">
+
+        <!-- ===== Scrolls away ===== -->
+        <LinearLayout
+            android:id="@+id/browse_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_scrollFlags="scroll">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginTop="@dimen/space_md"
+                android:layout_marginEnd="@dimen/screen_margin"
+                android:accessibilityHeading="true"
+                android:text="@string/browse_title"
+                android:textAppearance="?attr/textAppearanceHeadlineMedium" />
+
+            <TextView
+                android:id="@+id/browse_greeting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginEnd="@dimen/screen_margin"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="Good morning, Maria" />
+
+            <!-- In line: the slim spotlight banner -->
+            <include
+                android:id="@+id/browse_banner"
+                layout="@layout/view_line_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginTop="@dimen/space_md"
+                android:layout_marginEnd="@dimen/screen_margin"
+                android:visibility="gone" />
+
+            <!-- Not in line: the shortest wait in your town -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/browse_highlight"
+                style="@style/Widget.Quapp.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginTop="@dimen/space_md"
+                android:layout_marginEnd="@dimen/screen_margin"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_md">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/browse_shortest_wait"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/browse_highlight_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:textAppearance="?attr/textAppearanceTitleLarge"
+                        tools:text="Free Medical Mission" />
+
+                    <TextView
+                        android:id="@+id/browse_highlight_where"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:fontFeatureSettings="tnum"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="Tagbilaran City Gym · 8 in line" />
+
+                    <TextView
+                        android:id="@+id/browse_highlight_wait"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_ms"
+                        android:textAppearance="?attr/textAppearanceStatHero"
+                        tools:text="11 min" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- First visit: which town? -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/browse_first_visit"
+                style="@style/Widget.Quapp.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginTop="@dimen/space_md"
+                android:layout_marginEnd="@dimen/screen_margin"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_md">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="@dimen/space_sm"
+                        android:gravity="center_vertical"
+                        android:text="@string/browse_which_town"
+                        android:textAppearance="?attr/textAppearanceTitleSmall"
+                        app:drawableStartCompat="@drawable/ic_map_pin"
+                        app:drawableTint="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_xs"
+                        android:text="@string/browse_which_town_body"
+                        android:textAppearance="?attr/textAppearanceBodySmall" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/browse_town_chips"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_ms"
+                        app:chipSpacingHorizontal="@dimen/space_sm" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- ===== Stays pinned: no scroll flags ===== -->
+        <LinearLayout
+            android:id="@+id/browse_pinned"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Search -->
+            <LinearLayout
+                android:id="@+id/browse_search_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/field_height"
+                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginTop="@dimen/space_ms"
+                android:layout_marginEnd="@dimen/screen_margin"
+                android:background="@drawable/bg_search"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/screen_margin"
+                android:paddingEnd="@dimen/screen_margin">
+
+                <ImageView
+                    android:layout_width="@dimen/icon_small"
+                    android:layout_height="@dimen/icon_small"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_search"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+
+                <EditText
+                    android:id="@+id/browse_search_input"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/field_height"
+                    android:layout_marginStart="@dimen/space_sm"
+                    android:layout_weight="1"
+                    android:autofillHints=""
+                    android:background="@null"
+                    android:hint="@string/browse_search_hint"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColorHint="@color/ink_faint" />
+            </LinearLayout>
+
+            <!-- Town and categories. The town chip stays first; categories scroll. -->
+            <HorizontalScrollView
+                android:id="@+id/browse_filters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_sm"
+                android:clipToPadding="false"
+                android:paddingStart="@dimen/screen_margin"
+                android:paddingEnd="@dimen/screen_margin"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/browse_town_chip"
+                        style="@style/Widget.Quapp.Chip.Town"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/space_sm"
+                        app:chipIcon="@drawable/ic_map_pin"
+                        app:closeIcon="@drawable/ic_chevron_down"
+                        app:closeIconVisible="true"
+                        tools:text="Tagbilaran City" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/browse_category_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipSpacingHorizontal="@dimen/space_sm"
+                        app:selectionRequired="true"
+                        app:singleLine="true"
+                        app:singleSelection="true" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/browse_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginTop="@dimen/space_md"
+                android:layout_marginEnd="@dimen/screen_margin"
+                android:layout_marginBottom="@dimen/space_sm"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="In Tagbilaran City · 4" />
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- The scrolling behaviour places the list under the app bar and passes its scrolls up -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/browse_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/screen_margin"
+        android:paddingEnd="@dimen/screen_margin"
+        android:paddingBottom="@dimen/space_md"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_queue_card" />
+
+    <!-- Empty town or no results. Scrolls too, so the header can still move on a short screen. -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/browse_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <include layout="@layout/view_empty_state" />
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Loading state -->
+    <include
+        android:id="@+id/browse_loading"
+        layout="@layout/view_loading_state"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <!-- Error state -->
+    <include
+        android:id="@+id/browse_error"
+        layout="@layout/view_error_state"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

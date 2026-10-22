@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing (DESIGN.md section 4). 16dp is the screen edge and card padding, 12dp the gap between cards. -->
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_sm">8dp</dimen>
+    <dimen name="space_ms">12dp</dimen>
+    <dimen name="space_md">16dp</dimen>
+    <dimen name="space_lg">24dp</dimen>
+    <dimen name="space_xl">32dp</dimen>
+
+    <!-- Civic Paper radii -->
+    <dimen name="radius_card">16dp</dimen>
+    <fraction name="radius_full">50%</fraction>
+    <dimen name="radius_sheet">24dp</dimen>
+    <dimen name="screen_margin">24dp</dimen>
+    <dimen name="card_gap">16dp</dimen>
+    <dimen name="radius_selection">8dp</dimen> <!-- the punched nav tab and selected chip -->
+
+    <!-- Ticket details (DESIGN.md section 5) -->
+    <dimen name="punch_radius">9dp</dimen>        <!-- holes in the spotlight's sides -->
+    <dimen name="punch_radius_small">5dp</dimen>  <!-- active nav tab, selected chip -->
+    <dimen name="punch_radius_badge">2.5dp</dimen>
+    <dimen name="punch_radius_banner">6dp</dimen>  <!-- the slim "You're in line" banner -->
+    <dimen name="chip_icon_size">16dp</dimen>
+    <!-- Queue cards (catalogue cards) -->
+    <dimen name="card_row_height">28dp</dimen>
+    <dimen name="card_hole">10dp</dimen>
+    <dimen name="double_rule_height">4dp</dimen>
+    <dimen name="card_elevation">1dp</dimen>
+    <dimen name="banner_min_height">72dp</dimen>
+    <dimen name="search_height">48dp</dimen>
+    <dimen name="owner_list_bottom_padding">88dp</dimen> <!-- room for the New queue button -->
+    <dimen name="tear_line_width">1.5dp</dimen>
+    <dimen name="stub_dock_notch">10dp</dimen>   <!-- the tear-off stub dock's top corners -->
+    <dimen name="stamp_radius">6dp</dimen>
+    <dimen name="stamp_inner_radius">4dp</dimen>
+    <dimen name="stamp_gap">3dp</dimen>
+    <dimen name="stamp_rule">2dp</dimen>
+    <dimen name="outcome_tile_size">56dp</dimen>
+    <dimen name="outcome_icon_size">28dp</dimen>
+    <dimen name="tear_line_dash">4dp</dimen>
+    <dimen name="hairline">1dp</dimen>
+    <dimen name="dot_leader_gap">3dp</dimen>     <!-- dot spacing in a receipt slip leader -->
+    <dimen name="pill_height">24dp</dimen>       <!-- status pill -->
+    <dimen name="avatar_size">56dp</dimen>
+    <dimen name="list_row_min_height">60dp</dimen>
+    <dimen name="ticket_stub_width">118dp</dimen>    <!-- the full ticket on My ticket (08) -->
+    <dimen name="ticket_min_height">152dp</dimen>
+    <dimen name="ticket_barcode_width">78dp</dimen>
+    <dimen name="ticket_barcode_height">16dp</dimen>
+    <dimen name="ticks_height">12dp</dimen>
+    <dimen name="ticks_gap">3dp</dimen>
+    <dimen name="grace_ring_size">48dp</dimen>
+    <dimen name="grace_ring_thickness">4dp</dimen>
+    <dimen name="console_lead_width">52dp</dimen>     <!-- the #24 tile in the console list -->
+    <dimen name="console_lead_height">40dp</dimen>
+    <dimen name="my_tickets_stub_width">118dp</dimen> <!-- where the tear line and punches sit on a compact ticket -->
+    <dimen name="brand_mark_width">34dp</dimen>   <!-- the ticket mark next to the wordmark; 4:5 -->
+    <dimen name="brand_mark_height">42.5dp</dimen>
+    <dimen name="splash_mark_width">112dp</dimen>
+    <dimen name="splash_mark_height">140dp</dimen>
+    <dimen name="tile_size">40dp</dimen>          <!-- icon tile in a list row or card -->
+    <dimen name="forgot_step_size">32dp</dimen>
+    <dimen name="field_height">56dp</dimen>        <!-- minimum; fields grow with system text -->
+    <dimen name="control_padding_horizontal">24dp</dimen>
+    <dimen name="control_padding_vertical">12dp</dimen>
+    <dimen name="control_icon_gap">8dp</dimen>
+    <dimen name="card_label_width">56dp</dimen>
+    <dimen name="share_qr_size">200dp</dimen>      <!-- Share queue's QR (canvas 31) -->
+    <dimen name="counter_qr_size">168dp</dimen>    <!-- the counter display's QR (canvas 32) -->
+
+    <dimen name="touch_target_min">48dp</dimen>
+    <dimen name="button_height_lg">56dp</dimen> <!-- buttons in the dock -->
+    <dimen name="button_height_xl">64dp</dimen> <!-- "I'm here" -->
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="icon_small">20dp</dimen>
+    <!-- Centers a 24dp icon in a 48dp touch target. -->
+    <dimen name="icon_inset">12dp</dimen>
+
+<dimen name="space_xxl">48dp</dimen><dimen name="space_xxxl">64dp</dimen>
+</resources>

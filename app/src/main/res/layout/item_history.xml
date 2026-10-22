@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One past queue. Not a card: history is a record to read, not objects to tap into.
+     Rows are split by a dashed rule, like stubs torn off a roll (hidden on the first row). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.example.quapp.TearLineView
+        android:id="@+id/history_rule"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tear_line_width"
+        app:tearColor="?attr/colorOutlineVariant" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/list_row_min_height"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/space_sm"
+        android:paddingBottom="@dimen/space_sm">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/space_ms"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/history_queue_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                tools:text="Free Medical Mission" />
+
+            <TextView
+                android:id="@+id/history_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFeatureSettings="tnum"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                tools:text="Ticket #12 · Tagbilaran City Gym" />
+
+            <TextView
+                android:id="@+id/history_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFeatureSettings="tnum"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                tools:text="Sat, Aug 22" />
+        </LinearLayout>
+
+        <!-- Status pill: colours set in HistoryAdapter -->
+        <TextView
+            android:id="@+id/history_status"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/pill_height"
+            android:background="@drawable/bg_pill"
+            android:gravity="center"
+            android:paddingStart="@dimen/space_sm"
+            android:paddingEnd="@dimen/space_sm"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            tools:backgroundTint="@color/ok_soft"
+            tools:text="Served"
+            tools:textColor="@color/ok" />
+    </LinearLayout>
+</LinearLayout>
