@@ -14,7 +14,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/paper">
 
     <!-- Opaque paper: the pinned part covers the cards scrolling under it. The textured ground,
          lined up with the window's, is set in code (Grain.groundBehind) -->
@@ -22,8 +23,8 @@
         android:id="@+id/browse_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/colorBackground"
-        app:elevation="0dp"
+        android:background="@color/paper"
+        app:elevation="@dimen/dimension_zero"
         app:liftOnScroll="false">
 
         <!-- ===== Scrolls away ===== -->
@@ -37,19 +38,19 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginStart="@dimen/space_md"
                 android:layout_marginTop="@dimen/space_md"
-                android:layout_marginEnd="@dimen/screen_margin"
+                android:layout_marginEnd="@dimen/space_md"
                 android:accessibilityHeading="true"
-                android:text="@string/browse_title"
+                android:text="@string/phase2b_explore_heading"
                 android:textAppearance="?attr/textAppearanceHeadlineMedium" />
 
             <TextView
                 android:id="@+id/browse_greeting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/screen_margin"
-                android:layout_marginEnd="@dimen/screen_margin"
+                android:layout_marginStart="@dimen/space_md"
+                android:layout_marginEnd="@dimen/space_md"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 tools:text="Good morning, Maria" />
@@ -60,9 +61,9 @@
                 layout="@layout/view_line_banner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginStart="@dimen/space_md"
                 android:layout_marginTop="@dimen/space_md"
-                android:layout_marginEnd="@dimen/screen_margin"
+                android:layout_marginEnd="@dimen/space_md"
                 android:visibility="gone" />
 
             <!-- Not in line: the shortest wait in your town -->
@@ -71,9 +72,9 @@
                 style="@style/Widget.Quapp.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginStart="@dimen/space_md"
                 android:layout_marginTop="@dimen/space_md"
-                android:layout_marginEnd="@dimen/screen_margin"
+                android:layout_marginEnd="@dimen/space_md"
                 android:clickable="true"
                 android:focusable="true"
                 android:visibility="gone">
@@ -96,7 +97,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_xs"
-                        android:textAppearance="?attr/textAppearanceTitleLarge"
+                        android:textAppearance="?attr/textAppearanceTitleSmall"
                         tools:text="Free Medical Mission" />
 
                     <TextView
@@ -125,9 +126,9 @@
                 style="@style/Widget.Quapp.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginStart="@dimen/space_md"
                 android:layout_marginTop="@dimen/space_md"
-                android:layout_marginEnd="@dimen/screen_margin"
+                android:layout_marginEnd="@dimen/space_md"
                 android:visibility="gone">
 
                 <LinearLayout
@@ -176,14 +177,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/field_height"
-                android:layout_marginStart="@dimen/screen_margin"
+                android:layout_marginStart="@dimen/space_md"
                 android:layout_marginTop="@dimen/space_ms"
-                android:layout_marginEnd="@dimen/screen_margin"
+                android:layout_marginEnd="@dimen/space_md"
                 android:background="@drawable/bg_search"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="@dimen/screen_margin"
-                android:paddingEnd="@dimen/screen_margin">
+                android:paddingStart="@dimen/space_md"
+                android:paddingEnd="@dimen/space_md">
 
                 <ImageView
                     android:layout_width="@dimen/icon_small"
@@ -194,7 +195,7 @@
 
                 <EditText
                     android:id="@+id/browse_search_input"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/dimension_zero"
                     android:layout_height="wrap_content"
                     android:minHeight="@dimen/field_height"
                     android:layout_marginStart="@dimen/space_sm"
@@ -216,8 +217,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_sm"
                 android:clipToPadding="false"
-                android:paddingStart="@dimen/screen_margin"
-                android:paddingEnd="@dimen/screen_margin"
+                android:paddingStart="@dimen/space_md"
+                android:paddingEnd="@dimen/space_md"
                 android:scrollbars="none">
 
                 <LinearLayout
@@ -252,9 +253,9 @@
                 android:id="@+id/browse_count"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/screen_margin"
-                android:layout_marginTop="@dimen/space_md"
-                android:layout_marginEnd="@dimen/screen_margin"
+                android:layout_marginStart="@dimen/space_md"
+                android:layout_marginTop="@dimen/space_sm"
+                android:layout_marginEnd="@dimen/space_md"
                 android:layout_marginBottom="@dimen/space_sm"
                 android:textAppearance="?attr/textAppearanceLabelSmall"
                 android:textColor="?attr/colorOnSurfaceVariant"
@@ -268,8 +269,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingStart="@dimen/screen_margin"
-        android:paddingEnd="@dimen/screen_margin"
+        android:paddingStart="@dimen/space_md"
+        android:paddingEnd="@dimen/space_md"
         android:paddingBottom="@dimen/space_md"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/item_queue_card" />

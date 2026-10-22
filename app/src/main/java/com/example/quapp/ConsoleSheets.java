@@ -35,6 +35,12 @@ final class ConsoleSheets {
         void onEdit();
         void onInsights();
         void onShare();
+        default void onCounters() { }
+        default void onAnnouncement() { }
+        default void onLookup() { }
+        default void onHandover() { }
+        default void onAppointments() { }
+        default void onStaff() { }
         void onStatus(Queue.Status status);
         void onClose();
     }
@@ -67,6 +73,20 @@ final class ConsoleSheets {
 
         Queue.Status status = queue.getStatus();
         boolean closed = status == Queue.Status.CLOSED;
+        if (FakeData.ownsQueue(queue.getId())) {
+            sheet.iconRow(R.drawable.ic_history, context.getString(R.string.p4_appointments),
+                    context.getString(R.string.p4_availability), false, sheet.dismissThen(listener::onAppointments));
+            sheet.iconRow(R.drawable.ic_more_vert, context.getString(R.string.p4_staff),
+                    context.getString(R.string.p4_members_list), false, sheet.dismissThen(listener::onStaff));
+            sheet.iconRow(R.drawable.ic_more_vert, context.getString(R.string.counters_title),
+                    context.getString(R.string.counters_menu_body), false, sheet.dismissThen(listener::onCounters));
+            sheet.iconRow(R.drawable.ic_info, context.getString(R.string.announcement_title),
+                    context.getString(R.string.announcement_menu_body), false, sheet.dismissThen(listener::onAnnouncement));
+            sheet.iconRow(R.drawable.ic_search, context.getString(R.string.lookup_title),
+                    context.getString(R.string.lookup_menu_body), false, sheet.dismissThen(listener::onLookup));
+            sheet.iconRow(R.drawable.ic_more_vert, context.getString(R.string.handover_title),
+                    context.getString(R.string.handover_menu_body), false, sheet.dismissThen(listener::onHandover));
+        }
         if (status == Queue.Status.OPEN || status == Queue.Status.PAUSED) {
             sheet.iconRow(R.drawable.ic_alarm_plus, context.getString(R.string.extend_title),
                     context.getString(R.string.options_extend_body_format, closes), false,
@@ -341,6 +361,8 @@ final class ConsoleSheets {
         }
 
         void show() {
+            dialog.getBehavior().setMaxHeight((int) (context.getResources().getDisplayMetrics().heightPixels * .9f));
+            dialog.getBehavior().setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
             dialog.show();
         }
 

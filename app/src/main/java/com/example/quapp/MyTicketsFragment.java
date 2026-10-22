@@ -60,6 +60,11 @@ public class MyTicketsFragment extends Fragment implements MyTicketsAdapter.OnTi
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        View family = view.findViewById(R.id.my_tickets_family);
+        ListRow.bind(family, R.drawable.ic_info, getString(R.string.p4_family), getString(R.string.family_draft_hint));
+        family.setFocusable(true);
+        androidx.core.view.ViewCompat.setScreenReaderFocusable(family, true);
+        family.setOnClickListener(v -> startActivity(Phase4Activity.intent(requireContext(), Phase4Activity.FAMILY)));
         count = view.findViewById(R.id.my_tickets_count);
         section = view.findViewById(R.id.my_tickets_section);
         ticketView = view.findViewById(R.id.my_tickets_ticket);
@@ -100,7 +105,7 @@ public class MyTicketsFragment extends Fragment implements MyTicketsAdapter.OnTi
                 if (spotlight == null) {
                     return;
                 }
-                ActiveTicketStore.markServed(spotlight.getId());
+                ActiveTicketStore.confirmArrival(spotlight.getId());
                 startActivity(ActiveTicketActivity.intent(requireContext(), spotlight.getId()));
             }
         });
@@ -115,7 +120,7 @@ public class MyTicketsFragment extends Fragment implements MyTicketsAdapter.OnTi
                     @Override
                     public void onMoved(Ticket moved, int places) {
                         bind();
-                        Snackbar.make(requireView(), getResources().getQuantityString(R.plurals.more_time_moved,
+                        QuappMotion.snackbar(requireView(), getResources().getQuantityString(R.plurals.more_time_moved,
                                 places, places, moved.getTicketNumber()), Snackbar.LENGTH_LONG).show();
                     }
                 });
@@ -238,7 +243,7 @@ public class MyTicketsFragment extends Fragment implements MyTicketsAdapter.OnTi
                     called.setVisibility(View.GONE);
                 } else {
                     if (getContext() != null) {
-                        Snackbar.make(requireView(), R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
+                        QuappMotion.snackbar(requireView(), R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
                     }
                     renderTickets(cachedTickets);
                 }
@@ -289,6 +294,10 @@ public class MyTicketsFragment extends Fragment implements MyTicketsAdapter.OnTi
 
     /** Canvas 12: the number in marigold, the grace timer and I'm here. */
     private void bindCalled(Ticket ticket) {
+        boolean confirmed = FakeData.arrivalConfirmed(ticket.getQueueId(), ticket.getId());
+        called.findViewById(R.id.my_tickets_called_here).setEnabled(!confirmed);
+        ((TextView) called.findViewById(R.id.my_tickets_called_here)).setText(
+                confirmed ? R.string.called_arrival_confirmed : R.string.ticket_here_action);
         ((TextView) called.findViewById(R.id.my_tickets_called_number)).setText(
                 getString(R.string.ticket_number_format, ticket.getTicketNumber()));
         ((TextView) called.findViewById(R.id.my_tickets_called_queue)).setText(getString(
@@ -297,7 +306,12 @@ public class MyTicketsFragment extends Fragment implements MyTicketsAdapter.OnTi
                 ticket.getQueueName(), ticket.getTicketNumber()));
         // Moving back is once per ticket, as on the Called screen.
         called.findViewById(R.id.my_tickets_called_move_back)
-                .setVisibility(ticket.isMovedBack() ? View.GONE : View.VISIBLE);
+                .setVisibility(ticket.isMovedBack() || confirmed ? View.GONE : View.VISIBLE);
+
+        Queue queue = FakeData.queueById(ticket.getQueueId());
+        boolean needsTimer = !confirmed && queue != null && queue.isGracePeriodEnabled();
+        ((View) calledRing.getParent()).setVisibility(needsTimer ? View.VISIBLE : View.GONE);
+        if (!needsTimer) return;
 
         graceTimer = new CountDownTimer(ActiveTicketStore.graceRemainingMs(ticket), 1_000L) {
             @Override

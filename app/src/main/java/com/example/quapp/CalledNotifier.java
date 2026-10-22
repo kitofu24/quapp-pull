@@ -54,7 +54,8 @@ final class CalledNotifier {
 
     @SuppressWarnings("MissingPermission") // canPost() checks it
     static void show(Context context, Ticket ticket) {
-        if (!canPost(context)) {
+        if (!ProfilePreferences.get(context).getBoolean("alerts", false)
+                || !ProfilePreferences.get(context).getBoolean("queueAlerts", true) || !canPost(context)) {
             return;
         }
         long remaining = ActiveTicketStore.graceRemainingMs(ticket);

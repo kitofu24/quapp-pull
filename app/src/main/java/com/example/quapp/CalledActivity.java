@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
 
@@ -32,6 +34,19 @@ public class CalledActivity extends AppCompatActivity {
     private CountDownTimer graceTimer;
     private TextView countdown;
     private CircularProgressIndicator ring;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable refresh = new Runnable() {
+        @Override public void run() {
+            Ticket ticket = ActiveTicketStore.ticket(ticketId);
+            if (ticket == null || ticket.getStatus() != Ticket.Status.CALLED) {
+                if (ticket == null) finish(); else showOutcome();
+                return;
+            }
+            if (FakeData.arrivalConfirmed(ticket.getQueueId(), ticketId)
+                    && findViewById(R.id.called_here_button).isEnabled()) bindArrival(ticket);
+            handler.postDelayed(this, 1000L);
+        }
+    };
 
     public static Intent intent(Context context, String ticketId) {
         Intent intent = new Intent(context, CalledActivity.class);
@@ -59,8 +74,9 @@ public class CalledActivity extends AppCompatActivity {
         findViewById(R.id.called_here_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ActiveTicketStore.markServed(ticketId);
-                showOutcome();
+                ActiveTicketStore.confirmArrival(ticketId);
+                Ticket ticket = ActiveTicketStore.ticket(ticketId);
+                if (ticket != null) bindArrival(ticket);
             }
         });
 
@@ -114,7 +130,9 @@ public class CalledActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.called_move_back_hint)).setText(canMove
                 ? R.string.called_move_back_hint : R.string.called_moved_back_hint);
 
-        startGraceTimer(ActiveTicketStore.graceRemainingMs(ticket));
+        bindArrival(ticket);
+        handler.removeCallbacks(refresh);
+        handler.post(refresh);
     }
 
     @Override
@@ -122,6 +140,23 @@ public class CalledActivity extends AppCompatActivity {
         super.onPause();
         // The deadline is the ticket's calledAt + 3 min, so stopping the display timer loses nothing.
         cancelGraceTimer();
+        handler.removeCallbacks(refresh);
+    }
+
+    private void bindArrival(Ticket ticket) {
+        boolean confirmed = FakeData.arrivalConfirmed(ticket.getQueueId(), ticketId);
+        Queue queue = FakeData.queueById(ticket.getQueueId());
+        boolean needsTimer = !confirmed && queue != null && queue.isGracePeriodEnabled();
+        findViewById(R.id.called_timer).setVisibility(needsTimer ? View.VISIBLE : View.GONE);
+        findViewById(R.id.called_here_button).setEnabled(!confirmed);
+        ((TextView) findViewById(R.id.called_here_button)).setText(
+                confirmed ? R.string.called_arrival_confirmed : R.string.ticket_here_action);
+        ((TextView) findViewById(R.id.called_instruction)).setText(
+                confirmed ? R.string.called_waiting_completion : R.string.called_instruction);
+        findViewById(R.id.called_move_back).setVisibility(!confirmed && !ticket.isMovedBack() ? View.VISIBLE : View.GONE);
+        findViewById(R.id.called_move_back_hint).setVisibility(confirmed ? View.GONE : View.VISIBLE);
+        if (!needsTimer) cancelGraceTimer();
+        else if (graceTimer == null) startGraceTimer(ActiveTicketStore.graceRemainingMs(ticket));
     }
 
     private void startGraceTimer(long remainingMs) {

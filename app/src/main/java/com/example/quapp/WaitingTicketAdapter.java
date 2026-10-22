@@ -93,8 +93,10 @@ public class WaitingTicketAdapter
                 tag.setText(R.string.console_walk_in_label);
                 tag.setVisibility(View.VISIBLE);
             } else {
-                phoneText.setText(context.getString(R.string.console_joined_phone_format,
-                        maskPhone(context, ticket.getHolderPhone()), joinedAgo(context, ticket)));
+                String phone = maskPhone(context, ticket.getHolderPhone());
+                String joined = joinedAgo(context, ticket);
+                phoneText.setText(phone.isEmpty() ? joined
+                        : context.getString(R.string.console_joined_phone_format, phone, joined));
                 tag.setVisibility(View.GONE);
             }
 
@@ -110,6 +112,9 @@ public class WaitingTicketAdapter
                                  final OnTicketActionListener actionListener) {
             PopupMenu popup = new PopupMenu(anchor.getContext(), anchor);
             popup.inflate(R.menu.menu_waiting_ticket);
+            // Waiting tickets must be called before they can be completed or marked absent.
+            popup.getMenu().removeItem(R.id.waiting_action_serve);
+            popup.getMenu().removeItem(R.id.waiting_action_no_show);
             popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {

@@ -1,4 +1,16 @@
-# DESIGN.md — Quapp visual system: Civic Paper
+# Current visual authority — Slate & Mint
+
+The current user-approved identity is Civic Slate & Mint. The historical Civic Paper specification below is preserved for context; its cream/espresso palette, bundled-font requirements, pervasive texture and decorative navigation do not override the current system.
+
+Current authority: the user's full-app redesign brief and the live vault's `Projects/Quapp/DESIGN.md` (Slate & Mint foundation recorded 2026-10-17, with subsequent screen decisions). The Android implementation uses existing color names as compatibility aliases: ground `#EEF6F4`, white surfaces, ink `#0F2220`, muted `#48605C`, teal spotlight `#0B4F4A`, mint action `#2DBBAE`, amber call signal `#F5B83D`, line `#CADCD7`.
+
+The professional UI pass retains system sans and condensed display type, 16sp body text, native Material controls and 48dp minimum targets. Screen headings use 29/36sp; section titles 24/29sp; supporting prose 16/22sp. Routine labels use sentence case with normal tracking. Numeric statistics use tabular figures. Buttons use their own 12dp radius; cards retain 16dp and sheets 24dp. Large labels grow vertically. Both roles share a plain white navigation bar with a quiet rounded selection. Ticket shapes and receipt details identify queue information; routine headers stay flat.
+
+Runtime coverage, limitations and evidence for this pass are tracked in `docs/professional-ui-review.md`. This is a frontend design update, not production/backend acceptance.
+
+---
+
+# Historical specification — Civic Paper
 
 The one visual reference for building Quapp's screens. It describes **what things look like**. **Why** they look that way is in `DECISIONS.md`, and the screen-by-screen mockups are on the design canvas.
 

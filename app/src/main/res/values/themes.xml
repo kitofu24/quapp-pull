@@ -4,7 +4,7 @@
     <style name="Theme.Quapp" parent="Theme.Material3Expressive.DayNight.NoActionBar">
         <!-- Ink on paper is the default action: the primary is not a brand hue -->
         <!-- Textures every Material component as it's inflated (QuappViewInflater, Grain) -->
-        <item name="viewInflaterClass">com.example.quapp.QuappViewInflater</item>
+        <item name="viewInflaterClass">com.google.android.material.theme.MaterialComponentsViewInflater</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/on_primary</item>
         <item name="colorPrimaryContainer">@color/primary_container</item>
@@ -76,6 +76,8 @@
         <item name="materialButtonStyle">@style/Widget.Quapp.Button</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.Quapp.Button.Outlined</item>
         <item name="borderlessButtonStyle">@style/Widget.Quapp.Button.Text</item>
+        <item name="materialSwitchStyle">@style/Widget.Quapp.Switch</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Quapp.Dialog</item>
         <item name="snackbarStyle">@style/Widget.Quapp.Snackbar</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.Quapp.BottomSheetDialog</item>
         <item name="snackbarTextViewStyle">@style/Widget.Quapp.Snackbar.Text</item>

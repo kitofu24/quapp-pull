@@ -142,7 +142,7 @@ public class GetVerifiedActivity extends AppCompatActivity {
                 }
                 submitButton.setEnabled(true);
                 submitButton.setText(R.string.verify_submit);
-                com.google.android.material.snackbar.Snackbar.make(
+                QuappMotion.snackbar(
                         findViewById(R.id.verify_root), R.string.error_default_message,
                         com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             }

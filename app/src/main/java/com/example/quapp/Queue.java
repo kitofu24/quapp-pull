@@ -13,7 +13,7 @@ import java.time.LocalTime;
 public class Queue {
 
     public enum Status {
-        /** Scheduled, not open yet. People can join early and hold a number. */
+        /** Scheduled, not open yet. Joining waits until the organizer opens it. */
         UPCOMING,
         OPEN,
         /** No new joins; people already in line keep their spot. */
@@ -156,9 +156,10 @@ public class Queue {
     @Nullable public Integer getNowServing() { return nowServing; }
     public int getEstimatedWaitMinutes() { return estimatedWaitMinutes; }
 
-    /** Open and Upcoming queues take joins (Upcoming lets people hold a number early). */
+    /** Only open queues whose scheduled opening has arrived accept new tickets. */
     public boolean acceptsJoins() {
-        return status == Status.OPEN || status == Status.UPCOMING;
+        return status == Status.OPEN && !TicketRules.queueDay(this, Format.today()).atTime(opensAt)
+                .atZone(Format.MANILA).toInstant().isAfter(Instant.now());
     }
 
     /** Named setters instead of a 27-argument constructor, so two booleans can't be swapped silently. */

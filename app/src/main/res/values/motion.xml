@@ -5,6 +5,11 @@
     <integer name="motion_duration_long">250</integer>
     <integer name="motion_duration_press">100</integer>
     <dimen name="motion_translation_small">8dp</dimen>
+    <!-- A nonzero style prevents Dialog.show() restoring its default window animation. -->
+    <style name="Animation.Quapp.None" parent="">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@null</item>
+    </style>
     <style name="Animation.Quapp.Sheet" parent="">
         <item name="android:windowEnterAnimation">@anim/quapp_sheet_enter</item>
         <item name="android:windowExitAnimation">@anim/quapp_sheet_exit</item>

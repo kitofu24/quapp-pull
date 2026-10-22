@@ -15,12 +15,16 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // The dock sits above the keyboard instead of behind it.
+        // The form and actions scroll above the keyboard.
         SystemBars.applyPaddingWithKeyboard(findViewById(R.id.login_root));
+        androidx.core.view.ViewCompat.setAccessibilityHeading(findViewById(R.id.login_heading), true);
 
         MaterialButton submitButton = findViewById(R.id.login_submit_button);
         MaterialButton registerButton = findViewById(R.id.login_register_button);
         MaterialButton forgotButton = findViewById(R.id.login_forgot_button);
+        findViewById(R.id.login_back).setOnClickListener(v -> finish());
+        AuthForms.bind(this, new int[]{R.id.login_phone_layout, R.id.login_password_layout},
+                new int[]{R.id.login_password_input}, this::submitLogin);
 
         forgotButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,11 +49,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void submitLogin() {
+        if (!findViewById(R.id.login_submit_button).isEnabled()) return;
         TextInputEditText phoneInput = findViewById(R.id.login_phone_input);
         TextInputEditText passwordInput = findViewById(R.id.login_password_input);
 
         String phone = Validation.normalizePhone(Forms.text(phoneInput));
-        String password = Forms.text(passwordInput);
+        String password = AuthForms.password(passwordInput);
 
         boolean valid = Forms.check(findViewById(R.id.login_phone_layout),
                 Validation.isValidPhone(phone), getString(R.string.login_phone_error));
@@ -57,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
                 !Validation.isBlank(password), getString(R.string.login_password_error));
 
         if (!valid) {
+            AuthForms.revealError(this, R.id.login_phone_layout, R.id.login_password_layout);
             return;
         }
 
@@ -73,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 if (user.getStatus() == User.Status.SUSPENDED) {
                     submitButton.setEnabled(true);
-                    submitButton.setText(R.string.login_action);
+                    submitButton.setText(R.string.auth_sign_in_demo);
                     startActivity(AccountSuspendedActivity.intent(LoginActivity.this, finalPhone));
                     return;
                 }
@@ -87,11 +93,16 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 submitButton.setEnabled(true);
-                submitButton.setText(R.string.login_action);
-                com.google.android.material.snackbar.Snackbar.make(
-                        findViewById(R.id.login_root), R.string.error_default_message,
+                submitButton.setText(R.string.auth_sign_in_demo);
+                QuappMotion.snackbar(
+                        findViewById(R.id.login_root), R.string.auth_demo_error,
                         com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override protected void onStop() {
+        AuthForms.clearPasswords(this, R.id.login_password_input);
+        super.onStop();
     }
 }

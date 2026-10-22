@@ -32,6 +32,7 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".OnboardingActivity" android:exported="false" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".ForgotPasswordActivity" />
         <activity android:name=".AccountSuspendedActivity" />
@@ -46,17 +47,28 @@
             android:name=".CalledActivity"
             android:theme="@style/Theme.Quapp.Called" />
         <activity android:name=".HelpActivity" />
+        <activity android:name=".ProfileSettingsActivity" />
         <activity android:name=".ReportQueueActivity" />
         <activity android:name=".OwnerHomeActivity" />
         <activity android:name=".CreateQueueActivity"/>
         <activity android:name=".LiveConsoleActivity"/>
+        <activity android:name=".CounterListActivity" android:exported="false" />
+        <activity android:name=".CounterActivity" android:exported="false" />
+        <activity android:name=".AnnouncementActivity" android:exported="false" />
+        <activity android:name=".OrganizerPreviewActivity" android:exported="false" />
+        <activity android:name=".OrganizerLookupActivity" android:exported="false" />
+        <activity android:name=".Phase4Activity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".OrganizerHandoverActivity" android:exported="false" />
+        <activity android:name=".PublicOrganizerActivity" android:exported="false" />
+        <activity android:name=".PublicOrganizationActivity" android:exported="false" />
         <activity android:name=".ShareQueueActivity" />
         <activity
             android:name=".CounterDisplayActivity"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="fullSensor"
             android:theme="@style/Theme.Quapp.Called" />
         <activity android:name=".QueueAnalyticsActivity" />
         <activity android:name=".HistoryActivity" />
+        <activity android:name=".SavedServicesActivity" android:exported="false" />
         <activity android:name=".GetVerifiedActivity" />
 
         <!-- "I'm here" on the called notification; only Quapp's own notification sends it -->

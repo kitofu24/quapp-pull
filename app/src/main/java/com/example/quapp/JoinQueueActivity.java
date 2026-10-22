@@ -160,7 +160,6 @@ public class JoinQueueActivity extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) {
                     return;
                 }
-                ActiveTicketStore.add(ticket);
                 startActivity(ActiveTicketActivity.intent(JoinQueueActivity.this, ticket.getId()));
                 if (NotificationPermissionActivity.shouldAsk(JoinQueueActivity.this)) {
                     startActivity(NotificationPermissionActivity.intent(JoinQueueActivity.this, ticket.getId()));
@@ -176,8 +175,9 @@ public class JoinQueueActivity extends AppCompatActivity {
                 }
                 submitButton.setEnabled(true);
                 submitButton.setText(R.string.join_action);
-                com.google.android.material.snackbar.Snackbar.make(
-                        findViewById(R.id.join_root), R.string.error_default_message,
+                QuappMotion.snackbar(
+                        findViewById(R.id.join_root), error instanceof IllegalStateException
+                                ? R.string.join_eligibility_changed : R.string.error_default_message,
                         com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             }
         });

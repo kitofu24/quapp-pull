@@ -125,7 +125,7 @@ public class LiveConsoleActivity extends AppCompatActivity
                             return;
                         }
                         render();
-                        Snackbar.make(ticketList, R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
+                        feedback(getString(R.string.error_default_message)).show();
                     }
                 });
             }
@@ -163,7 +163,7 @@ public class LiveConsoleActivity extends AppCompatActivity
                             return;
                         }
                         render();
-                        Snackbar.make(ticketList, R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
+                        feedback(getString(R.string.error_default_message)).show();
                     }
                 });
             }
@@ -244,7 +244,7 @@ public class LiveConsoleActivity extends AppCompatActivity
                             return;
                         }
                         render();
-                        Snackbar.make(ticketList, R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
+                        feedback(getString(R.string.error_default_message)).show();
                     }
                 });
             }
@@ -279,6 +279,16 @@ public class LiveConsoleActivity extends AppCompatActivity
                 startActivity(ShareQueueActivity.intent(LiveConsoleActivity.this, queueId));
             }
 
+            @Override public void onCounters() {
+                startActivity(CounterListActivity.intent(LiveConsoleActivity.this, queueId));
+            }
+
+            @Override public void onAnnouncement() { startActivity(AnnouncementActivity.intent(LiveConsoleActivity.this, queueId)); }
+            @Override public void onLookup() { startActivity(OrganizerLookupActivity.intent(LiveConsoleActivity.this, queueId)); }
+            @Override public void onAppointments() { startActivity(Phase4Activity.ownerIntent(LiveConsoleActivity.this, Phase4Activity.APPOINTMENTS, queueId)); }
+            @Override public void onStaff() { startActivity(Phase4Activity.ownerIntent(LiveConsoleActivity.this, Phase4Activity.STAFF, queueId)); }
+            @Override public void onHandover() { startActivity(OrganizerHandoverActivity.intent(LiveConsoleActivity.this, queueId)); }
+
             @Override
             public void onStatus(Queue.Status status) {
                 changeStatus(status);
@@ -299,8 +309,8 @@ public class LiveConsoleActivity extends AppCompatActivity
                     public void onExtended(LocalTime closesAt) {
                         FakeData.extendClosing(queueId, closesAt);
                         render();
-                        Snackbar.make(ticketList, getString(R.string.extend_done_format,
-                                Format.time(LiveConsoleActivity.this, closesAt)), Snackbar.LENGTH_SHORT)
+                        feedback(getString(R.string.extend_done_format,
+                                Format.time(LiveConsoleActivity.this, closesAt)))
                                 .setAnchorView(R.id.console_tear)
                                 .show();
                     }
@@ -354,7 +364,7 @@ public class LiveConsoleActivity extends AppCompatActivity
         final TextInputLayout nameLayout = body.findViewById(R.id.walk_in_name_layout);
         final TextInputEditText nameInput = body.findViewById(R.id.walk_in_name_input);
 
-        final AlertDialog dialog = new MaterialAlertDialogBuilder(this)
+        final AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Quapp_Dialog_WalkIn)
                 .setTitle(R.string.console_walk_in_title)
                 .setView(body)
                 .setNegativeButton(R.string.console_cancel, null)
@@ -381,9 +391,8 @@ public class LiveConsoleActivity extends AppCompatActivity
                         }
                         dialog.dismiss();
                         render();
-                        Snackbar.make(ticketList, getString(R.string.console_walk_in_added,
-                                ticket.getTicketNumber(), ticket.getHolderName()),
-                                Snackbar.LENGTH_SHORT).setAnchorView(R.id.console_tear).show();
+                        feedback(getString(R.string.console_walk_in_added,
+                                ticket.getTicketNumber(), ticket.getHolderName())).setAnchorView(R.id.console_tear).show();
                     }
 
                     @Override
@@ -392,7 +401,7 @@ public class LiveConsoleActivity extends AppCompatActivity
                             return;
                         }
                         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                        Snackbar.make(ticketList, R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
+                        feedback(getString(R.string.error_default_message)).show();
                     }
                 });
             }
@@ -558,10 +567,15 @@ public class LiveConsoleActivity extends AppCompatActivity
         }
     }
 
+    private Snackbar feedback(CharSequence message) {
+        return QuappMotion.snackbar(ticketList, message, Snackbar.LENGTH_SHORT)
+                .setTextMaxLines(Integer.MAX_VALUE);
+    }
+
     /** "#22 Rosa Diaz marked served", above the dock. */
     private void announce(int message, Ticket ticket) {
-        Snackbar.make(ticketList, getString(message, ticket.getTicketNumber(),
-                ticket.getHolderName()), Snackbar.LENGTH_SHORT)
+        feedback(getString(message, ticket.getTicketNumber(),
+                ticket.getHolderName()))
                 .setAnchorView(R.id.console_tear)
                 .show();
     }

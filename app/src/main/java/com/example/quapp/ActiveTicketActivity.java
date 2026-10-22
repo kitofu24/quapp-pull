@@ -115,7 +115,7 @@ public class ActiveTicketActivity extends AppCompatActivity {
                             @Override
                             public void onMoved(Ticket moved, int places) {
                                 render();
-                                Snackbar.make(ticketCard, getResources().getQuantityString(
+                                QuappMotion.snackbar(ticketCard, getResources().getQuantityString(
                                         R.plurals.more_time_moved, places, places,
                                         moved.getTicketNumber()), Snackbar.LENGTH_LONG)
                                         .setAnchorView(R.id.ticket_tear)
@@ -156,7 +156,7 @@ public class ActiveTicketActivity extends AppCompatActivity {
                 if (connectivity.isOnline()) {
                     render();
                 } else {
-                    Snackbar.make(ticketCard, R.string.ticket_offline_still, Snackbar.LENGTH_SHORT)
+                    QuappMotion.snackbar(ticketCard, R.string.ticket_offline_still, Snackbar.LENGTH_SHORT)
                             .setAnchorView(R.id.ticket_tear)
                             .show();
                 }
@@ -321,13 +321,19 @@ public class ActiveTicketActivity extends AppCompatActivity {
             aheadLabel.setText(R.string.ticket_next_label);
         }
 
-        Ticket serving = FakeData.nowServing(ticket.getQueueId());
+        java.util.List<Ticket> servingTickets = FakeData.servingTickets(ticket.getQueueId());
+        Ticket serving = servingTickets.isEmpty() ? null : servingTickets.get(0);
         ProgressTicksView ticks = findViewById(R.id.ticket_ticks);
         ticks.setProgress(serving == null ? 0f
                 : serving.getTicketNumber() / (float) (serving.getTicketNumber() + ahead + 1));
         ((TextView) findViewById(R.id.ticket_now_serving)).setText(serving == null
                 ? getString(R.string.ticket_now_serving_none)
                 : getString(R.string.ticket_now_serving_format, serving.getTicketNumber()));
+        if (servingTickets.size() > 1) {
+            java.util.List<String> numbers = new java.util.ArrayList<>();
+            for (Ticket called : servingTickets) numbers.add(getString(R.string.ticket_number_format, called.getTicketNumber()));
+            ((TextView) findViewById(R.id.ticket_now_serving)).setText(getString(R.string.counters_now_serving_format, android.text.TextUtils.join(", ", numbers)));
+        }
 
         ticketCard.setContentDescription(getString(R.string.ticket_description,
                 ticket.getTicketNumber(), aheadText.getVisibility() == View.VISIBLE
@@ -452,7 +458,7 @@ public class ActiveTicketActivity extends AppCompatActivity {
                                         moreTimeButton.setEnabled(true);
                                         loadingStateHelper.showContent();
                                         render();
-                                        Snackbar.make(ticketCard, R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
+                                        QuappMotion.snackbar(ticketCard, R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
                                     }
                                 });
                             }

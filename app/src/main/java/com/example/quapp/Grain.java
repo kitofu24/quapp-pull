@@ -84,16 +84,9 @@ public final class Grain {
                 grain.setBounds(0, 0, right - left, bottom - top));
     }
 
-    /** Textures a bottom sheet's paper once it's on screen. */
+    /** Preserve native sheet motion while keeping routine sheet surfaces flat. */
     public static void attach(@NonNull BottomSheetDialog sheet) {
         QuappMotion.sheet(sheet);
-        sheet.setOnShowListener(dialog -> {
-            View paper = sheet.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-            if (paper != null) {
-                attach(paper);
-                paper.requestLayout();
-            }
-        });
     }
 
     /**
@@ -111,8 +104,8 @@ public final class Grain {
      * It follows the header as it collapses, since the header moves without redrawing.
      */
     public static void groundBehind(@NonNull AppBarLayout bar) {
-        bar.setBackground(new Ground(bar));
-        bar.addOnOffsetChangedListener((appBar, offset) -> appBar.invalidate());
+        // Routine headers match the flat Slate & Mint window; texture stays on ticket surfaces.
+        bar.setBackgroundResource(R.drawable.bg_paper);
     }
 
     /** The tile for a fill colour, or null when the fill is (nearly) see-through. */

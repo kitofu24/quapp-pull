@@ -235,7 +235,7 @@ public class OwnerQueuesFragment extends Fragment implements QueueAdapter.OnQueu
                     createFab.hide();
                 } else {
                     if (getContext() != null) {
-                        com.google.android.material.snackbar.Snackbar.make(
+                        QuappMotion.snackbar(
                                 requireView(), R.string.error_default_message,
                                 com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
                     }
@@ -312,7 +312,8 @@ public class OwnerQueuesFragment extends Fragment implements QueueAdapter.OnQueu
             return;
         }
         final Queue queue = current;
-        Ticket serving = FakeData.nowServing(queue.getId());
+        List<Ticket> servingTickets = FakeData.servingTickets(queue.getId());
+        Ticket serving = servingTickets.isEmpty() ? null : servingTickets.get(0);
         ((TextView) live.findViewById(R.id.owner_live_number)).setText(serving == null
                 ? getString(R.string.browse_eta_none)
                 : getString(R.string.ticket_number_format, serving.getTicketNumber()));

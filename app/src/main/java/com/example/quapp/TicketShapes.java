@@ -86,18 +86,11 @@ public final class TicketShapes {
     }
 
     /**
-     * The tear-off stub dock (Queue detail, Join): raised paper with its top corners bitten out,
-     * square at the bottom where it meets the screen edge.
+     * A quiet dock for Queue detail and Join; the ticket itself carries the punched identity.
      */
     public static Drawable stubDockBackground(@NonNull Context context) {
-        float notch = px(context, R.dimen.stub_dock_notch);
-        ShapeAppearanceModel shape = ShapeAppearanceModel.builder()
-                .setTopLeftCorner(new NotchCornerTreatment())
-                .setTopRightCorner(new NotchCornerTreatment())
-                .setTopLeftCornerSize(notch)
-                .setTopRightCornerSize(notch)
-                .build();
-        return background(context, shape, ContextCompat.getColor(context, R.color.paper_raised));
+        return new android.graphics.drawable.ColorDrawable(
+                ContextCompat.getColor(context, R.color.paper_raised));
     }
 
     /**

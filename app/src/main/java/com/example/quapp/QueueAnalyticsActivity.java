@@ -43,7 +43,7 @@ public class QueueAnalyticsActivity extends AppCompatActivity {
         });
 
         loadingStateHelper = new LoadingStateHelper(
-                null,
+                findViewById(R.id.analytics_content),
                 null,
                 findViewById(R.id.analytics_loading),
                 findViewById(R.id.analytics_error)
@@ -85,8 +85,7 @@ public class QueueAnalyticsActivity extends AppCompatActivity {
                         }
                         cachedStats = stats;
                         loadingStateHelper.showContent();
-                        TextView queueName = findViewById(R.id.analytics_queue_name);
-                        queueName.setText(getString(R.string.analytics_subtitle_format, queue.getName()));
+                        bindQueueName(queue.getName());
                         bindForecast(stats);
                         bindToday(stats);
                     }
@@ -105,6 +104,13 @@ public class QueueAnalyticsActivity extends AppCompatActivity {
         });
     }
 
+    private void bindQueueName(String name) {
+        TextView queueName = findViewById(R.id.analytics_queue_name);
+        queueName.setText(name == null || name.trim().isEmpty()
+                ? getString(R.string.analytics_today_label)
+                : getString(R.string.analytics_subtitle_format, name));
+    }
+
     private void handleError() {
         if (isFinishing() || isDestroyed()) {
             return;
@@ -112,7 +118,7 @@ public class QueueAnalyticsActivity extends AppCompatActivity {
         if (cachedStats == null) {
             loadingStateHelper.showError(getString(R.string.error_default_message));
         } else {
-            com.google.android.material.snackbar.Snackbar.make(
+            QuappMotion.snackbar(
                     findViewById(R.id.analytics_root), R.string.error_default_message,
                     com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
         }
@@ -156,13 +162,20 @@ public class QueueAnalyticsActivity extends AppCompatActivity {
     private void bindToday(QueueStats stats) {
         LinearLayout slip = findViewById(R.id.analytics_slip);
         ReceiptSlip.clear(slip);
-        ReceiptSlip.addRow(slip, getString(R.string.analytics_served_label),
+        addTodayRow(slip, getString(R.string.analytics_served_label),
                 String.valueOf(stats.getServedToday()));
-        ReceiptSlip.addRow(slip, getString(R.string.analytics_waiting_label),
+        addTodayRow(slip, getString(R.string.analytics_waiting_label),
                 String.valueOf(stats.getWaitingNow()));
-        ReceiptSlip.addRow(slip, getString(R.string.analytics_no_shows_label),
+        addTodayRow(slip, getString(R.string.analytics_no_shows_label),
                 String.valueOf(stats.getNoShowsToday()));
-        ReceiptSlip.addRow(slip, getString(R.string.analytics_no_show_rate_label),
+        addTodayRow(slip, getString(R.string.analytics_no_show_rate_label),
                 getString(R.string.analytics_percent_format, stats.getNoShowRatePercent()));
+    }
+
+    private void addTodayRow(LinearLayout slip, CharSequence label, CharSequence value) {
+        View row = getLayoutInflater().inflate(R.layout.view_analytics_slip_row, slip, false);
+        ((TextView) row.findViewById(R.id.slip_label)).setText(label);
+        ((TextView) row.findViewById(R.id.slip_value)).setText(value);
+        slip.addView(row);
     }
 }

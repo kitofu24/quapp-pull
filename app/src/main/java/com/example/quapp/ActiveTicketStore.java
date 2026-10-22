@@ -121,7 +121,7 @@ public final class ActiveTicketStore {
     // ---- Changing -----------------------------------------------------------
 
     public static void add(Ticket ticket) {
-        held.add(ticket);
+        if (!holds(ticket.getId())) held.add(ticket);
     }
 
     /** Demo hook: the counter calls this ticket (see FakeData.callTicket). */
@@ -132,12 +132,11 @@ public final class ActiveTicketStore {
         }
     }
 
-    /** "I'm here": served, as far as the queuer is concerned; the console sees it confirmed. */
-    public static void markServed(String ticketId) {
+    /** Arrival confirms presence; only the organizer can complete service. */
+    public static void confirmArrival(String ticketId) {
         Ticket ticket = ticket(ticketId);
         if (ticket != null && ticket.getStatus() == Ticket.Status.CALLED) {
             FakeData.confirmArrival(ticket.getQueueId(), ticketId);
-            replace(ticket.withStatus(Ticket.Status.SERVED));
         }
     }
 
@@ -203,7 +202,7 @@ public final class ActiveTicketStore {
 
     /**
      * Brings every live ticket up to date with its line. A finished ticket keeps what it
-     * became (the queuer's "I'm here" is final even before the counter taps Served).
+     * became. Arrival confirmation keeps the ticket live until the organizer completes service.
      */
     private static void refresh() {
         for (int i = 0; i < held.size(); i++) {
@@ -216,7 +215,9 @@ public final class ActiveTicketStore {
                 continue;
             }
             // Called and the window closed while no screen was watching: release it now.
-            if (now.getStatus() == Ticket.Status.CALLED && graceRemainingMs(now) == 0) {
+            Queue queue = FakeData.queueById(now.getQueueId());
+            if (now.getStatus() == Ticket.Status.CALLED && queue != null && queue.isGracePeriodEnabled()
+                    && !FakeData.arrivalConfirmed(now.getQueueId(), now.getId()) && graceRemainingMs(now) == 0) {
                 FakeData.releaseCalled(now.getQueueId(), now.getId());
                 now = FakeData.ticket(mine.getQueueId(), mine.getId());
             }

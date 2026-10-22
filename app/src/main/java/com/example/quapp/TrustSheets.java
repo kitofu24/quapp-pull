@@ -30,9 +30,17 @@ final class TrustSheets {
      * Both offer Report this queue.
      */
     static void showOrganizer(final Activity activity, final Queue queue) {
+        showOrganizer(activity, queue, true);
+    }
+
+    static void showOrganizer(final Activity activity, final Queue queue, boolean allowQueueReport) {
         final Notice notice = new Notice(activity);
         boolean verified = queue.isOrganizerVerified();
-        String name = "<b>" + TextUtils.htmlEncode(queue.getOrganizerName()) + "</b>";
+        String organizerName = queue.getOrganizerName();
+        if (organizerName == null || organizerName.trim().isEmpty()) {
+            organizerName = activity.getString(R.string.badge_organizer_fallback);
+        }
+        String name = "<b>" + TextUtils.htmlEncode(organizerName) + "</b>";
 
         notice.icon(verified ? R.drawable.ic_badge_check : R.drawable.ic_info,
                 verified ? R.color.ok : R.color.warn);
@@ -45,6 +53,7 @@ final class TrustSheets {
         notice.primary.setText(R.string.badge_got_it);
         notice.primary.setOnClickListener(notice.dismiss());
         notice.secondary.setText(R.string.badge_report);
+        notice.secondary.setVisibility(allowQueueReport ? View.VISIBLE : View.GONE);
         notice.secondary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

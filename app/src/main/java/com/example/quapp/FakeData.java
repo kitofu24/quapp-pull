@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,8 +50,14 @@ public final class FakeData {
 
     /** The mutable live side of one queue — what the owner changes from the Live Console. */
     private static final class LiveQueue {
-        final List<Ticket> waiting = new ArrayList<>();
-        final RollingAverage serviceTimes = new RollingAverage(SERVICE_TIME_WINDOW);
+        final List<Ticket> waiting;
+        final RollingAverage serviceTimes;
+        final Map<String, LiveQueue> counters = new LinkedHashMap<>();
+        final Map<String, String> counterNames = new LinkedHashMap<>();
+        int nextCounterNumber = 2;
+        String announcement;
+        LiveQueue() { this.waiting = new ArrayList<>(); this.serviceTimes = new RollingAverage(SERVICE_TIME_WINDOW); }
+        LiveQueue(LiveQueue line) { this.waiting = line.waiting; this.serviceTimes = line.serviceTimes; }
         Ticket nowServing;
         /** The person being served didn't confirm in time; already counted as a no-show. */
         boolean nowServingTimedOut;
@@ -251,11 +258,14 @@ public final class FakeData {
         }, callback);
     }
 
-    public static void reportAsync(final String queueId, final Report.Reason reason, final String details, final Callback<Void> callback) {
+    public static void reportAsync(final android.content.Context context, final String queueId, final Report.Reason reason, final String details, final Callback<Void> callback) {
+        final String reporter = new Session(context).isLoggedIn() ? new Session(context).getPhone() : null;
         dispatchAsync(new Supplier<Void>() {
             @Override
             public Void get() {
-                report(queueId, reason, details);
+                Report report = new Report("r" + (reports.size() + 1), queueId, reason, details, Instant.now());
+                report.setReporterPhone(reporter);
+                reports.add(report);
                 return null;
             }
         }, callback);
@@ -275,6 +285,8 @@ public final class FakeData {
         dispatchAsync(new Supplier<User>() {
             @Override
             public User get() {
+                if (context instanceof android.app.Activity && (((android.app.Activity) context).isFinishing()
+                        || ((android.app.Activity) context).isDestroyed())) throw new java.util.concurrent.CancellationException();
                 User suspended = suspendedAccount(phone);
                 if (suspended != null) {
                     return suspended;
@@ -290,6 +302,8 @@ public final class FakeData {
         dispatchAsync(new Supplier<User>() {
             @Override
             public User get() {
+                if (context instanceof android.app.Activity && (((android.app.Activity) context).isFinishing()
+                        || ((android.app.Activity) context).isDestroyed())) throw new java.util.concurrent.CancellationException();
                 Session session = new Session(context);
                 session.register(name, phone);
                 return new User("u-registered", name, phone, User.Status.ACTIVE, null, null, VerificationStatus.NONE, null);
@@ -314,7 +328,7 @@ public final class FakeData {
 
     // ---- Queues -------------------------------------------------------------
 
-    public static List<Queue> queues() {
+    public static synchronized List<Queue> queues() {
         ensureSeeded();
         List<Queue> result = new ArrayList<>();
         for (Queue queue : queues) {
@@ -323,7 +337,7 @@ public final class FakeData {
         return result;
     }
 
-    public static Queue queueById(String queueId) {
+    public static synchronized Queue queueById(String queueId) {
         ensureSeeded();
         for (Queue queue : queues) {
             if (queue.getId().equals(queueId)) {
@@ -333,7 +347,7 @@ public final class FakeData {
         return null;
     }
 
-    public static List<Queue> ownedQueues() {
+    public static synchronized List<Queue> ownedQueues() {
         ensureSeeded();
         List<Queue> result = new ArrayList<>();
         for (String id : ownedIds) {
@@ -356,7 +370,7 @@ public final class FakeData {
     }
 
     /** Adds a new queue (owned by the current user) or replaces one with the same id. */
-    public static void saveQueue(Queue queue) {
+    public static synchronized void saveQueue(Queue queue) {
         ensureSeeded();
         for (int i = 0; i < queues.size(); i++) {
             if (queues.get(i).getId().equals(queue.getId())) {
@@ -374,7 +388,7 @@ public final class FakeData {
      * Pausing keeps everyone in line so the owner can finish. Closing ends every ticket still in
      * line as QUEUE_CLOSED, which never counts as a no-show (DECISIONS.md "A fifth ticket status").
      */
-    public static void setQueueStatus(String queueId, Queue.Status status) {
+    public static synchronized void setQueueStatus(String queueId, Queue.Status status) {
         Queue queue = queueById(queueId);
         if (queue == null) {
             return;
@@ -395,8 +409,13 @@ public final class FakeData {
                 finish(ticket, Ticket.Status.QUEUE_CLOSED);
             }
             // A timed-out slot is already a no-show; anyone else at the counter is closed out.
-            if (state.nowServing != null && !state.nowServingTimedOut) {
-                finish(state.nowServing, Ticket.Status.QUEUE_CLOSED);
+            for (LiveQueue counter : servingSlots(state)) {
+                if (counter.nowServing != null && !counter.nowServingTimedOut) {
+                    finish(counter.nowServing, Ticket.Status.QUEUE_CLOSED);
+                }
+                counter.nowServing = null;
+                counter.nowServingConfirmedAt = null;
+                counter.nowServingTimedOut = false;
             }
             state.waiting.clear();
             state.nowServing = null;
@@ -406,8 +425,119 @@ public final class FakeData {
 
     // ---- Live console -------------------------------------------------------
 
+    public static final String MAIN_COUNTER_ID = "main";
+
+    /** Local demo ownership check; the future server must enforce the authenticated owner. */
+    public static synchronized boolean ownsQueue(String queueId) {
+        ensureSeeded();
+        for (Queue queue : queues) if (queue.getId().equals(queueId)) return MY_ORGANIZER_ID.equals(queue.getOrganizerId()) && ownedIds.contains(queueId);
+        return false;
+    }
+
+    private static LiveQueue ownedLine(String queueId) {
+        if (!ownsQueue(queueId)) throw new SecurityException("Queue owner required");
+        return liveState(queueId);
+    }
+
+    public static synchronized List<QueueCounter> counters(String queueId) {
+        LiveQueue line = ownedLine(queueId);
+        List<QueueCounter> result = new ArrayList<>();
+        result.add(new QueueCounter(MAIN_COUNTER_ID, queueId, line.counterNames.getOrDefault(MAIN_COUNTER_ID, "")));
+        for (String id : line.counters.keySet()) result.add(new QueueCounter(id, queueId, line.counterNames.get(id)));
+        return result;
+    }
+
+    public static synchronized QueueCounter createCounter(String queueId, String name) {
+        LiveQueue line = ownedLine(queueId);
+        String clean = counterName(name);
+        String id = queueId + "-counter-" + line.nextCounterNumber++;
+        line.counters.put(id, new LiveQueue(line));
+        line.counterNames.put(id, clean);
+        return new QueueCounter(id, queueId, clean);
+    }
+
+    /** Public message for this queue's displays; process-local until the server exists. */
+    public static synchronized String announcement(String queueId) {
+        return queueById(queueId) == null ? null : liveState(queueId).announcement;
+    }
+
+    public static synchronized void publishAnnouncement(String queueId, String message) {
+        LiveQueue line = ownedLine(queueId);
+        if (Validation.isBlank(message)) throw new IllegalArgumentException("Announcement required");
+        String clean = message.trim();
+        if (clean.codePointCount(0, clean.length()) > 500) throw new IllegalArgumentException("Announcement too long");
+        line.announcement = clean;
+    }
+
+    public static synchronized void clearAnnouncement(String queueId) { ownedLine(queueId).announcement = null; }
+
+    /** Exact, owner-only lookup; does not advance simulation, grace timers or ticket state. */
+    public static synchronized Ticket findTicketByNumber(String queueId, int number) {
+        if (!ownsQueue(queueId)) throw new SecurityException("Queue owner required");
+        if (number < 0) throw new IllegalArgumentException("Nonnegative ticket number required");
+        LiveQueue line = live.get(queueId);
+        if (line == null) return null;
+        for (int i = 0; i < line.waiting.size(); i++) if (line.waiting.get(i).getTicketNumber() == number) return placed(line, i);
+        for (LiveQueue slot : servingSlots(line)) if (slot.nowServing != null && slot.nowServing.getTicketNumber() == number) return slot.nowServingTimedOut ? finished.get(slot.nowServing.getId()) : slot.nowServing;
+        for (Ticket ticket : finished.values()) if (queueId.equals(ticket.getQueueId()) && ticket.getTicketNumber() == number) return ticket;
+        return null;
+    }
+
+    public static synchronized void renameCounter(String queueId, String counterId, String name) {
+        LiveQueue line = ownedLine(queueId);
+        counterSlot(line, counterId);
+        line.counterNames.put(counterId, counterName(name));
+    }
+
+    private static String counterName(String name) {
+        if (Validation.isBlank(name)) throw new IllegalArgumentException("Counter name required");
+        return name.trim();
+    }
+
+    private static LiveQueue counterSlot(LiveQueue line, String counterId) {
+        if (MAIN_COUNTER_ID.equals(counterId)) return line;
+        LiveQueue slot = line.counters.get(counterId);
+        if (slot == null) throw new IllegalArgumentException("Counter not found");
+        return slot;
+    }
+
+    public static synchronized Ticket counterServing(String queueId, String counterId) {
+        LiveQueue slot = counterSlot(ownedLine(queueId), counterId);
+        return slot.nowServingTimedOut ? null : slot.nowServing;
+    }
+
+    public static synchronized Ticket callNextAtCounter(String queueId, String counterId) {
+        LiveQueue line = ownedLine(queueId);
+        Queue.Status status = queueById(queueId).getStatus();
+        if (status != Queue.Status.OPEN && status != Queue.Status.PAUSED) throw new IllegalStateException("Queue is not running");
+        LiveQueue slot = counterSlot(line, counterId);
+        expireSlot(queueById(queueId), slot);
+        if (slot.nowServing != null && !slot.nowServingTimedOut) throw new IllegalStateException("Finish current ticket first");
+        callFront(slot);
+        return slot.nowServing;
+    }
+
+    public static synchronized void finishCounter(String queueId, String counterId, boolean noShow) {
+        LiveQueue slot = counterSlot(ownedLine(queueId), counterId);
+        expireSlot(queueById(queueId), slot);
+        if (slot.nowServing == null || slot.nowServingTimedOut) return;
+        if (noShow) slot.noShows++; else recordServed(slot);
+        finish(slot.nowServing, noShow ? Ticket.Status.NO_SHOW : Ticket.Status.SERVED);
+        slot.nowServing = null;
+        slot.nowServingConfirmedAt = null;
+    }
+
+    private static List<LiveQueue> servingSlots(LiveQueue line) {
+        List<LiveQueue> slots = new ArrayList<>(); slots.add(line); slots.addAll(line.counters.values()); return slots;
+    }
+
+    private static LiveQueue ticketSlot(LiveQueue line, String ticketId) {
+        for (LiveQueue slot : servingSlots(line)) if (slot.nowServing != null && slot.nowServing.getId().equals(ticketId)) return slot;
+        return line;
+    }
+
     /** The line in call order, each ticket stamped with its current position and wait. */
-    public static List<Ticket> waitingTickets(String queueId) {
+    public static synchronized List<Ticket> waitingTickets(String queueId) {
         LiveQueue state = liveState(queueId);
         List<Ticket> result = new ArrayList<>();
         for (int i = 0; i < state.waiting.size(); i++) {
@@ -416,7 +546,7 @@ public final class FakeData {
         return result;
     }
 
-    public static Ticket nowServing(String queueId) {
+    public static synchronized Ticket nowServing(String queueId) {
         return liveState(queueId).nowServing;
     }
 
@@ -427,23 +557,41 @@ public final class FakeData {
      *
      * @return true when the person being served has timed out
      */
-    public static boolean checkGraceExpired(String queueId) {
+    public static synchronized boolean checkGraceExpired(String queueId) {
         LiveQueue state = liveState(queueId);
         Queue queue = queueById(queueId);
+        for (LiveQueue slot : servingSlots(state)) expireSlot(queue, slot);
+        return state.nowServingTimedOut;
+    }
+
+    private static void expireSlot(Queue queue, LiveQueue state) {
         Ticket serving = state.nowServing;
         if (serving == null || state.nowServingTimedOut || queue == null
                 || !queue.isGracePeriodEnabled() || serving.getCalledAt() == null) {
-            return state.nowServingTimedOut;
+            return;
         }
         if (state.nowServingConfirmedAt == null && Instant.now().isAfter(graceDeadline(serving))) {
             timeOut(state);
         }
-        return state.nowServingTimedOut;
+    }
+
+    /** Serving tickets for number-only public presentation; counter metadata remains owner-only. */
+    public static synchronized List<Ticket> servingTickets(String queueId) {
+        checkGraceExpired(queueId);
+        List<Ticket> result = new ArrayList<>();
+        for (LiveQueue slot : servingSlots(liveState(queueId))) if (slot.nowServing != null && !slot.nowServingTimedOut) result.add(slot.nowServing);
+        result.sort((a, b) -> Integer.compare(a.getTicketNumber(), b.getTicketNumber()));
+        return result;
     }
 
     /** When the person being served tapped "I'm here", or null. */
-    public static Instant confirmedAt(String queueId) {
+    public static synchronized Instant confirmedAt(String queueId) {
         return liveState(queueId).nowServingConfirmedAt;
+    }
+
+    public static synchronized boolean arrivalConfirmed(String queueId, String ticketId) {
+        LiveQueue slot = ticketSlot(liveState(queueId), ticketId);
+        return isAtCounter(slot, ticketId) && slot.nowServingConfirmedAt != null;
     }
 
     /** When the person being served must confirm by. */
@@ -452,7 +600,7 @@ public final class FakeData {
     }
 
     /** The person currently being served is done; the front of the line is called. */
-    public static Ticket callNext(String queueId) {
+    public static synchronized Ticket callNext(String queueId) {
         LiveQueue state = liveState(queueId);
 
         // A timed-out ticket was already counted as a no-show, so it isn't also "served".
@@ -466,7 +614,7 @@ public final class FakeData {
     }
 
     /** The person being served didn't come up: count a no-show and call the next number. */
-    public static Ticket noShowAndCallNext(String queueId) {
+    public static synchronized Ticket noShowAndCallNext(String queueId) {
         LiveQueue state = liveState(queueId);
 
         if (state.nowServing != null && !state.nowServingTimedOut) {
@@ -478,21 +626,25 @@ public final class FakeData {
         return state.nowServing;
     }
 
-    public static void markServed(String queueId, String ticketId) {
-        LiveQueue state = liveState(queueId);
-        Ticket ticket = removeById(state.waiting, ticketId);
-        if (ticket != null) {
-            recordServed(state);
-            finish(ticket, Ticket.Status.SERVED);
+    public static synchronized void markServed(String queueId, String ticketId) {
+        LiveQueue line = ownedLine(queueId);
+        for (QueueCounter counter : counters(queueId)) {
+            LiveQueue slot = counterSlot(line, counter.getId());
+            if (isAtCounter(slot, ticketId)) {
+                finishCounter(queueId, counter.getId(), false);
+                return;
+            }
         }
     }
 
-    public static void markNoShow(String queueId, String ticketId) {
-        LiveQueue state = liveState(queueId);
-        Ticket ticket = removeById(state.waiting, ticketId);
-        if (ticket != null) {
-            state.noShows++;
-            finish(ticket, Ticket.Status.NO_SHOW);
+    public static synchronized void markNoShow(String queueId, String ticketId) {
+        LiveQueue line = ownedLine(queueId);
+        for (QueueCounter counter : counters(queueId)) {
+            LiveQueue slot = counterSlot(line, counter.getId());
+            if (isAtCounter(slot, ticketId)) {
+                finishCounter(queueId, counter.getId(), true);
+                return;
+            }
         }
     }
 
@@ -501,7 +653,7 @@ public final class FakeData {
      * a no-show (and, on the server, goes to the admin); a duplicate or someone who asked to
      * leave doesn't.
      */
-    public static void removeFromLine(String queueId, String ticketId, Ticket.RemovalReason reason) {
+    public static synchronized void removeFromLine(String queueId, String ticketId, Ticket.RemovalReason reason) {
         LiveQueue state = liveState(queueId);
         Ticket ticket = removeById(state.waiting, ticketId);
         if (ticket == null) {
@@ -527,8 +679,12 @@ public final class FakeData {
     }
 
     /** Someone without a phone joins at the counter. */
-    public static Ticket addWalkIn(String queueId, String holderName) {
+    public static synchronized Ticket addWalkIn(String queueId, String holderName) {
         Queue queue = queueById(queueId);
+        if (queue == null) throw new IllegalArgumentException("Queue not found");
+        if (!ownsQueue(queueId)) throw new SecurityException("Queue owner required");
+        if (queue.getStatus() == Queue.Status.CLOSED)
+            throw new IllegalStateException("Queue is closed to walk-ins");
         LiveQueue state = liveState(queueId);
         int number = state.nextTicketNumber++;
 
@@ -555,8 +711,19 @@ public final class FakeData {
     }
 
     /** Joining puts a new ticket at the back of the line. */
-    public static Ticket join(String queueId, String holderName, String holderPhone) {
+    public static synchronized Ticket join(String queueId, String holderName, String holderPhone) {
         Queue queue = queueById(queueId);
+        if (queue == null) throw new IllegalArgumentException("Queue not found");
+        Ticket existing = ActiveTicketStore.ticketForQueue(queueId);
+        if (existing != null) return existing;
+        if (!queue.acceptsJoins())
+            throw new IllegalStateException("Queue is unavailable for new tickets");
+        if (ActiveTicketStore.overlapping(queue) != null)
+            throw new IllegalStateException("Queue hours overlap an active ticket");
+        if (queue.isNoShowCooldownEnabled() && Cooldown.isActive())
+            throw new IllegalStateException("No-show cooldown is active");
+        if (Validation.isBlank(holderName) || !Validation.isValidPhone(holderPhone))
+            throw new IllegalArgumentException("A name and valid phone are required");
         LiveQueue state = liveState(queueId);
         int number = state.nextTicketNumber++;
         Ticket ticket = new Ticket.Builder()
@@ -567,17 +734,21 @@ public final class FakeData {
                 .setTicketNumber(number)
                 .build();
         state.waiting.add(ticket);
-        return placed(state, state.waiting.size() - 1);
+        Ticket placed = placed(state, state.waiting.size() - 1);
+        // Registration belongs to issuance, so a destroyed Activity cannot lose the ticket.
+        ActiveTicketStore.add(placed);
+        return placed;
     }
 
     /**
      * Where a ticket stands now: in line (with its position and wait), at the counter (CALLED),
      * or how it ended. Null if this queue never had it.
      */
-    public static Ticket ticket(String queueId, String ticketId) {
+    public static synchronized Ticket ticket(String queueId, String ticketId) {
         LiveQueue state = liveState(queueId);
-        if (state.nowServing != null && state.nowServing.getId().equals(ticketId)) {
-            return state.nowServingTimedOut ? finished.get(ticketId) : state.nowServing;
+        LiveQueue slot = ticketSlot(state, ticketId);
+        if (slot.nowServing != null && slot.nowServing.getId().equals(ticketId)) {
+            return slot.nowServingTimedOut ? finished.get(ticketId) : slot.nowServing;
         }
         int index = indexOf(state.waiting, ticketId);
         if (index >= 0) {
@@ -590,7 +761,7 @@ public final class FakeData {
      * Demo hook until the console and the queuer are on different phones: the counter calls
      * this ticket now. Whoever was at the counter is finished first, as with Call next.
      */
-    public static void callTicket(String queueId, String ticketId) {
+    public static synchronized void callTicket(String queueId, String ticketId) {
         LiveQueue state = liveState(queueId);
         int index = indexOf(state.waiting, ticketId);
         if (index < 0) {
@@ -605,8 +776,8 @@ public final class FakeData {
     }
 
     /** "I'm here": the console shows the person as confirmed. */
-    public static void confirmArrival(String queueId, String ticketId) {
-        LiveQueue state = liveState(queueId);
+    public static synchronized void confirmArrival(String queueId, String ticketId) {
+        LiveQueue state = ticketSlot(liveState(queueId), ticketId);
         if (isAtCounter(state, ticketId)) {
             state.nowServingConfirmedAt = Instant.now();
             leftCounter(ticketId);
@@ -614,16 +785,16 @@ public final class FakeData {
     }
 
     /** The queuer's grace period ran out (or the demo skipped it): a no-show, counted once. */
-    public static void releaseCalled(String queueId, String ticketId) {
-        LiveQueue state = liveState(queueId);
+    public static synchronized void releaseCalled(String queueId, String ticketId) {
+        LiveQueue state = ticketSlot(liveState(queueId), ticketId);
         if (isAtCounter(state, ticketId)) {
             timeOut(state);
         }
     }
 
     /** Leave queue: the ticket is simply gone. Not a no-show, and it doesn't go to history. */
-    public static void leave(String queueId, String ticketId) {
-        LiveQueue state = liveState(queueId);
+    public static synchronized void leave(String queueId, String ticketId) {
+        LiveQueue state = ticketSlot(liveState(queueId), ticketId);
         if (isAtCounter(state, ticketId)) {
             state.nowServing = null;
             state.nowServingConfirmedAt = null;
@@ -638,8 +809,9 @@ public final class FakeData {
      * Called to the counter already, it hands the slot back and rejoins with {@code places}
      * people ahead. Never a no-show. Once per ticket; the caller checks.
      */
-    public static Ticket moveBack(String queueId, String ticketId, int places) {
-        LiveQueue state = liveState(queueId);
+    public static synchronized Ticket moveBack(String queueId, String ticketId, int places) {
+        LiveQueue line = liveState(queueId);
+        LiveQueue state = ticketSlot(line, ticketId);
         Ticket ticket;
         int index;
         if (isAtCounter(state, ticketId)) {
@@ -661,7 +833,7 @@ public final class FakeData {
                 .setCalledAt(null)
                 .setMovedBack(Instant.now())
                 .build());
-        return placed(state, index);
+        return placed(line, index);
     }
 
     /** The estimator's minutes per person right now (in FakeData, the rolling average). */
@@ -674,13 +846,15 @@ public final class FakeData {
         return forecastMinutes(liveState(queueId), peopleAhead);
     }
 
-    public static QueueStats stats(String queueId) {
+    public static synchronized QueueStats stats(String queueId) {
         LiveQueue state = liveState(queueId);
         double averageMs = averageServiceMs(state);
+        int served = 0, noShows = 0;
+        for (LiveQueue slot : servingSlots(state)) { served += slot.served; noShows += slot.noShows; }
 
         return new QueueStats(
-                state.served,
-                state.noShows,
+                served,
+                noShows,
                 state.waiting.size(),
                 averageMs / 60_000d,
                 state.serviceTimes.size(),
@@ -837,9 +1011,14 @@ public final class FakeData {
         if (MY_ORGANIZER_ID.equals(queue.getOrganizerId())) {
             builder.setOrganizer(MY_ORGANIZER_ID, MY_ORGANIZER_NAME, isMyOrganizerVerified());
         }
+        Ticket representative = null;
+        for (LiveQueue slot : servingSlots(state)) {
+            if (slot.nowServing != null && !slot.nowServingTimedOut
+                    && (representative == null || slot.nowServing.getTicketNumber() < representative.getTicketNumber())) representative = slot.nowServing;
+        }
         return builder
                 .setPeopleWaiting(waiting)
-                .setNowServing(state.nowServing == null ? null : state.nowServing.getTicketNumber())
+                .setNowServing(representative == null ? null : representative.getTicketNumber())
                 .setEstimatedWaitMinutes(eta)
                 .build();
     }

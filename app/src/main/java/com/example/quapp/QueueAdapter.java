@@ -27,9 +27,15 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.QueueViewHol
     private final List<Queue> queues = new ArrayList<>();
     private final Map<String, QueueStats> statsById = new HashMap<>();
     private final OnQueueClickListener clickListener;
+    private final boolean bookmarks;
 
     public QueueAdapter(OnQueueClickListener clickListener) {
+        this(clickListener, false);
+    }
+
+    public QueueAdapter(OnQueueClickListener clickListener, boolean bookmarks) {
         this.clickListener = clickListener;
+        this.bookmarks = bookmarks;
     }
 
     /** Browse: no stats. */
@@ -73,6 +79,19 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.QueueViewHol
     public void onBindViewHolder(@NonNull QueueViewHolder holder, int position) {
         Queue queue = queues.get(position);
         holder.bind(queue, statsById.get(queue.getId()), clickListener);
+        android.widget.ImageButton save = holder.itemView.findViewById(R.id.card_save);
+        save.setVisibility(bookmarks ? View.VISIBLE : View.GONE);
+        if (bookmarks) {
+            boolean saved = new SavedServices(save.getContext()).contains(queue.getId());
+            save.setSelected(saved);
+            save.setImageResource(saved ? R.drawable.ic_bookmark_filled : R.drawable.ic_bookmark);
+            save.setContentDescription(save.getContext().getString(
+                    saved ? R.string.saved_remove_named : R.string.saved_save_named, queue.getName()));
+            save.setOnClickListener(v -> {
+                new SavedServices(v.getContext()).toggle(queue.getId());
+                notifyItemChanged(holder.getBindingAdapterPosition());
+            });
+        }
     }
 
     @Override

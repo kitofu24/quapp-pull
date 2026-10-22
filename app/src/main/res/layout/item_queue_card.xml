@@ -40,6 +40,16 @@
             android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="Relief · No. 001" />
 
+        <ImageButton
+            android:id="@+id/card_save"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_bookmark"
+            android:contentDescription="@string/saved_save"
+            android:visibility="gone"
+            app:tint="?attr/colorPrimary" />
+
         <!-- The stamp's double-ruled outline is set in code (TicketShapes.stampBackground) -->
         <TextView
             android:id="@+id/card_status"

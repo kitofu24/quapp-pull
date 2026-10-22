@@ -98,6 +98,7 @@ public class LoadingStateHelper {
 
     private boolean updateVisibility(State state) {
         boolean changed = currentState != state;
+        boolean animate = changed && currentState != null;
         currentState = state;
         if (loadingView != null) {
             loadingView.setVisibility(state == State.LOADING ? View.VISIBLE : View.GONE);
@@ -110,6 +111,21 @@ public class LoadingStateHelper {
         }
         if (errorView != null) {
             errorView.setVisibility(state == State.ERROR ? View.VISIBLE : View.GONE);
+        }
+        // Keep tickets/QR and actions immediate; only soften a newly shown status panel.
+        if (changed) {
+            for (View panel : new View[]{loadingView, emptyView, errorView}) {
+                if (panel == null) continue;
+                panel.animate().cancel();
+                panel.setAlpha(1f);
+                if (animate && panel.getVisibility() == View.VISIBLE
+                        && panel.isAttachedToWindow() && QuappMotion.enabled(panel.getContext())) {
+                    panel.setAlpha(0.85f);
+                    panel.animate().alpha(1f)
+                            .setDuration(panel.getResources().getInteger(R.integer.motion_duration_short))
+                            .setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+                }
+            }
         }
         return changed;
     }

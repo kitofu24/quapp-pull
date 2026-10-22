@@ -30,13 +30,11 @@ public class Session {
     private static final String KEY_NOTIFICATIONS_ASKED = "notifications_asked";
 
     /**
-     * What this install remembers across accounts, so logging out doesn't reset it. Stands in
-     * for the server's device_install_id count (MODELS.md) until there's a backend.
+     * Existing local registration history survives sign-out. It does not enforce account
+     * eligibility; a genuine authentication service must define production policy.
      */
     private static final String DEVICE_PREFS_NAME = "quapp_device";
     private static final String KEY_DEVICE_ACCOUNTS = "accounts";
-    /** One phone can hold 2 accounts, so a shared family phone still works (canvas 56). */
-    public static final int MAX_ACCOUNTS_PER_DEVICE = 2;
 
     private final SharedPreferences prefs;
     private final SharedPreferences devicePrefs;
@@ -114,11 +112,6 @@ public class Session {
             accounts.add(getPhone());
         }
         return accounts;
-    }
-
-    /** The device limit (canvas 56): no third account on the same phone. */
-    public boolean deviceAccountLimitReached() {
-        return deviceAccounts().size() >= MAX_ACCOUNTS_PER_DEVICE;
     }
 
     /** The notification permission screen (canvas 20) is shown once, after the first join. */

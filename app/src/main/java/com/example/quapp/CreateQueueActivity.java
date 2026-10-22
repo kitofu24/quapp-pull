@@ -53,6 +53,9 @@ public class CreateQueueActivity extends AppCompatActivity {
     private static final String STATE_END = "end";
     private static final String STATE_OPENS = "opens";
     private static final String STATE_CLOSES = "closes";
+    private static final String STATE_GRACE = "grace_enabled";
+    private static final String STATE_PENALTY = "penalty_enabled";
+    private static final String STATE_PROXIMITY = "proximity_enabled";
 
     private static final String TAG_START_PICKER = "start_picker";
     private static final String TAG_END_PICKER = "end_picker";
@@ -60,6 +63,7 @@ public class CreateQueueActivity extends AppCompatActivity {
     private static final String TAG_CLOSES_PICKER = "closes_picker";
 
     private Queue existingQueue;
+    private String previewSnapshotId;
 
     // Picker choices
     private String municipality;
@@ -86,6 +90,7 @@ public class CreateQueueActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        previewSnapshotId = savedInstanceState == null ? null : savedInstanceState.getString("preview_snapshot_id");
         setContentView(R.layout.activity_create_queue);
         SystemBars.applyPaddingWithKeyboard(findViewById(R.id.create_root));
 
@@ -102,6 +107,16 @@ public class CreateQueueActivity extends AppCompatActivity {
         setUpToggles();
         bindPostingAs();
         loadChoices(savedInstanceState);
+        findViewById(R.id.create_simplified_note).setVisibility(existingQueue == null ? View.VISIBLE : View.GONE);
+        if (existingQueue == null) {
+            // Keep legacy edit fields and model data; new queues derive these from selected facts.
+            int[] removed = {R.id.create_name_layout, R.id.create_venue_layout, R.id.create_short_layout};
+            int[] fields = {R.id.create_name_input, R.id.create_venue_input, R.id.create_short_input};
+            for (int i = 0; i < removed.length; i++) {
+                findViewById(removed[i]).setVisibility(View.GONE);
+                hideFieldLabel(findViewById(R.id.create_root), fields[i]);
+            }
+        }
         setUpPickers();
         setUpLength();
         reattachPickers();
@@ -126,6 +141,12 @@ public class CreateQueueActivity extends AppCompatActivity {
                 submitQueue();
             }
         });
+        findViewById(R.id.create_preview_button).setOnClickListener(v -> {
+            if (!validateForm()) return;
+            PreviewSnapshots.remove(previewSnapshotId);
+            previewSnapshotId = PreviewSnapshots.put(buildFormQueue("preview-" + java.util.UUID.randomUUID()));
+            startActivity(OrganizerPreviewActivity.intent(this, previewSnapshotId));
+        });
 
         showChoices();
     }
@@ -133,6 +154,7 @@ public class CreateQueueActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putString("preview_snapshot_id", previewSnapshotId);
         outState.putString(STATE_MUNICIPALITY, municipality);
         outState.putString(STATE_CATEGORY, category == null ? null : category.name());
         // java.time values are saved as their ISO text ("2026-09-27", "08:00").
@@ -140,6 +162,14 @@ public class CreateQueueActivity extends AppCompatActivity {
         outState.putString(STATE_END, endDate.toString());
         outState.putString(STATE_OPENS, opensAt.toString());
         outState.putString(STATE_CLOSES, closesAt.toString());
+        outState.putBoolean(STATE_GRACE, graceSwitch.isChecked());
+        outState.putBoolean(STATE_PENALTY, penaltySwitch.isChecked());
+        outState.putBoolean(STATE_PROXIMITY, proximitySwitch.isChecked());
+    }
+
+    @Override protected void onDestroy() {
+        if (isFinishing()) PreviewSnapshots.remove(previewSnapshotId);
+        super.onDestroy();
     }
 
     private void cacheViews() {
@@ -164,6 +194,9 @@ public class CreateQueueActivity extends AppCompatActivity {
             endDate = LocalDate.parse(saved.getString(STATE_END));
             opensAt = LocalTime.parse(saved.getString(STATE_OPENS));
             closesAt = LocalTime.parse(saved.getString(STATE_CLOSES));
+            graceSwitch.setChecked(saved.getBoolean(STATE_GRACE, true));
+            penaltySwitch.setChecked(saved.getBoolean(STATE_PENALTY, true));
+            proximitySwitch.setChecked(saved.getBoolean(STATE_PROXIMITY, false));
             return;
         }
         if (existingQueue != null) {
@@ -236,6 +269,8 @@ public class CreateQueueActivity extends AppCompatActivity {
         ((TextView) row.findViewById(R.id.toggle_label)).setText(labelRes);
         ((TextView) row.findViewById(R.id.toggle_summary)).setText(summaryRes);
         final MaterialSwitch toggle = row.findViewById(R.id.toggle_switch);
+        // Reused rows share toggle_switch; save editable choices separately to avoid ID collisions.
+        toggle.setSaveEnabled(false);
         toggle.setChecked(checkedByDefault);
         row.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -461,6 +496,9 @@ public class CreateQueueActivity extends AppCompatActivity {
     private void showChoices() {
         municipalityField.setText(municipality);
         categoryField.setText(category == null ? null : getString(category.label));
+        if (municipality != null) pickerChosen(municipalityField, true);
+        if (category != null) pickerChosen(categoryField, true);
+        if (municipality != null && category != null) findViewById(R.id.create_pick_error).setVisibility(View.GONE);
         categoryField.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 category == null ? 0 : category.icon, 0, R.drawable.ic_chevron_down, 0);
 
@@ -495,47 +533,77 @@ public class CreateQueueActivity extends AppCompatActivity {
 
     // ---- Saving ----------------------------------------------------------------
 
-    private void submitQueue() {
+    private void hideFieldLabel(View view, int fieldId) {
+        if (view.getLabelFor() == fieldId) view.setVisibility(View.GONE);
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) hideFieldLabel(group.getChildAt(i), fieldId);
+        }
+    }
+
+    private boolean validateForm() {
+        String name = text(R.id.create_name_input);
+        String venue = text(R.id.create_venue_input);
+        String shortDescription = text(R.id.create_short_input);
+
+        // Checked in on-screen order, and all of them, so every problem shows at once.
+        boolean valid = true;
+        if (existingQueue != null) {
+            valid = required(R.id.create_name_layout, name);
+            valid &= required(R.id.create_venue_layout, venue);
+            valid &= required(R.id.create_short_layout, shortDescription);
+        }
+        valid &= pickerChosen(municipalityField, municipality != null);
+        valid &= pickerChosen(categoryField, category != null);
+        findViewById(R.id.create_pick_error).setVisibility(
+                municipality == null || category == null ? View.VISIBLE : View.GONE);
+        valid &= scheduleValid();
+
+        if (!valid) {
+            int fieldId;
+            int regionId;
+            if (existingQueue != null && Validation.isBlank(name)) { fieldId = R.id.create_name_input; regionId = R.id.create_name_layout; }
+            else if (existingQueue != null && Validation.isBlank(venue)) { fieldId = R.id.create_venue_input; regionId = R.id.create_venue_layout; }
+            else if (municipality == null) { fieldId = R.id.create_municipality; regionId = fieldId; }
+            else if (category == null) { fieldId = R.id.create_category; regionId = fieldId; }
+            else if (existingQueue != null && Validation.isBlank(shortDescription)) { fieldId = R.id.create_short_input; regionId = R.id.create_short_layout; }
+            else { fieldId = endDate.isBefore(startDate) ? R.id.create_end_date : R.id.create_closes; regionId = fieldId; }
+            View field = findViewById(fieldId);
+            field.setFocusableInTouchMode(true);
+            View region = findViewById(regionId);
+            // Error messages change row heights; reveal after the layout has settled.
+            androidx.core.view.OneShotPreDrawListener.add(region, () -> {
+                field.requestFocus();
+                region.requestRectangleOnScreen(
+                        new android.graphics.Rect(0, 0, region.getWidth(), region.getHeight()), true);
+            });
+        }
+        return valid;
+    }
+
+    private Queue buildFormQueue(String newId) {
         String name = text(R.id.create_name_input);
         String venue = text(R.id.create_venue_input);
         String shortDescription = text(R.id.create_short_input);
         String details = text(R.id.create_details_input);
         String bring = text(R.id.create_bring_input);
-
-        // Checked in on-screen order, and all of them, so every problem shows at once.
-        boolean valid = required(R.id.create_name_layout, name);
-        valid &= required(R.id.create_venue_layout, venue);
-        valid &= pickerChosen(municipalityField, municipality != null);
-        valid &= pickerChosen(categoryField, category != null);
-        findViewById(R.id.create_pick_error).setVisibility(
-                municipality == null || category == null ? View.VISIBLE : View.GONE);
-        valid &= required(R.id.create_short_layout, shortDescription);
-        valid &= scheduleValid();
-
-        if (!valid) {
-            return;
-        }
-
-        // Unverified organizers run one queue at a time (canvas 58). One that opens later is fine.
-        if (existingQueue == null && !startsLater() && !FakeData.isMyOrganizerVerified()) {
-            Queue running = FakeData.myLiveQueue(null);
-            if (running != null) {
-                TrustSheets.showOneLiveQueue(this, running);
-                return;
-            }
+        if (existingQueue == null) {
+            name = getString(R.string.create_generated_name, getString(category.label), municipality);
+            venue = municipality;
+            shortDescription = "";
         }
 
         // Editing keeps id, organizer, location and status; creating starts fresh.
         Queue.Builder builder = existingQueue != null
                 ? existingQueue.toBuilder()
                 : new Queue.Builder()
-                        .setId(FakeData.newQueueId())
+                        .setId(newId)
                         .setOrganizer(FakeData.MY_ORGANIZER_ID, FakeData.MY_ORGANIZER_NAME,
                                 FakeData.isMyOrganizerVerified())
                         .setLocation(FakeData.defaultLatitude(), FakeData.defaultLongitude())
                         .setStatus(startsLater() ? Queue.Status.UPCOMING : Queue.Status.OPEN);
 
-        final Queue queue = builder
+        return builder
                 .setName(name)
                 .setVenue(venue)
                 .setMunicipality(municipality)
@@ -548,6 +616,16 @@ public class CreateQueueActivity extends AppCompatActivity {
                 .setNoShowCooldownEnabled(penaltySwitch.isChecked())
                 .setProximity(proximitySwitch.isChecked(), checkedRadius())
                 .build();
+    }
+
+    private void submitQueue() {
+        if (!validateForm()) return;
+        // Keep the existing one-live-queue guard before allocating an operational queue id.
+        if (existingQueue == null && !startsLater() && !FakeData.isMyOrganizerVerified()) {
+            Queue running = FakeData.myLiveQueue(null);
+            if (running != null) { TrustSheets.showOneLiveQueue(this, running); return; }
+        }
+        final Queue queue = buildFormQueue(existingQueue == null ? FakeData.newQueueId() : existingQueue.getId());
 
         final MaterialButton submitButton = findViewById(R.id.create_submit_button);
         submitButton.setEnabled(false);
@@ -569,7 +647,7 @@ public class CreateQueueActivity extends AppCompatActivity {
                 }
                 submitButton.setEnabled(true);
                 submitButton.setText(existingQueue != null ? R.string.create_save_action : R.string.create_action);
-                com.google.android.material.snackbar.Snackbar.make(
+                QuappMotion.snackbar(
                         findViewById(R.id.create_root), R.string.error_default_message,
                         com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
             }

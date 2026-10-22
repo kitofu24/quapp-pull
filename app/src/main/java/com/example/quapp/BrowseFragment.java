@@ -96,8 +96,17 @@ public class BrowseFragment extends Fragment implements QueueAdapter.OnQueueClic
         categoryGroup = view.findViewById(R.id.browse_category_group);
 
         list.setLayoutManager(new LinearLayoutManager(requireContext()));
-        cardAdapter = new QueueAdapter(this);
-        openNowAdapter = new OpenNowAdapter(this);
+        cardAdapter = new QueueAdapter(this, true);
+        openNowAdapter = new OpenNowAdapter(this, () -> { });
+        // Short windows need the filters to scroll away so the results retain usable touch targets.
+        if (getResources().getConfiguration().screenHeightDp < 480) {
+            View pinned = view.findViewById(R.id.browse_pinned);
+            com.google.android.material.appbar.AppBarLayout.LayoutParams params =
+                    (com.google.android.material.appbar.AppBarLayout.LayoutParams) pinned.getLayoutParams();
+            params.setScrollFlags(com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+                    | com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+            pinned.setLayoutParams(params);
+        }
 
         // The banner is a slim spotlight with small punches in its sides.
         banner.setBackground(TicketShapes.background(requireContext(),
@@ -375,6 +384,7 @@ public class BrowseFragment extends Fragment implements QueueAdapter.OnQueueClic
         count.setText(getString(query.trim().isEmpty() ? R.string.browse_open_now_format
                 : R.string.browse_results_format, queues.size()));
         if (list.getAdapter() != openNowAdapter) list.setAdapter(openNowAdapter);
+        ProfilePreferences.order(requireContext(), queues);
         openNowAdapter.submitQueues(queues);
         list.setVisibility(View.VISIBLE);
     }
@@ -395,6 +405,7 @@ public class BrowseFragment extends Fragment implements QueueAdapter.OnQueueClic
         count.setText(searching ? getString(R.string.browse_results_format, queues.size())
                 : getString(R.string.browse_in_town_format, town, queues.size()));
         if (list.getAdapter() != cardAdapter) list.setAdapter(cardAdapter);
+        ProfilePreferences.order(requireContext(), queues);
         cardAdapter.submitQueues(queues);
 
         boolean empty = queues.isEmpty();

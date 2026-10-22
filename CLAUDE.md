@@ -1,5 +1,13 @@
 # Quapp — instructions for Claude Code
 
+## Current project context
+Live vault: `C:/Users/JUSKWAA/.codex/visualizations/2026/10/14/01a1398c-051d-73a3-bb55-b678ce0e53a3/Quapp-Memory-Vault`.
+Start with `Projects/Quapp/HANDOFF.md` through `END CURRENT CHECKPOINT`. Its Git status is a dated snapshot; inspect live Git when relevant.
+Read supporting source/tests and matching note sections for the task, not all project history at startup. Existing repo-local DECISIONS/DESIGN/PROGRESS/MODELS instructions below remain applicable; flag conflicts with live-vault records before changing affected behavior.
+All existing coding, accessibility, testing, teach-mode, completion and approval constraints below remain unchanged. The handoff does not authorize additional work.
+Graphify is optional for cross-file relationships targeted searches cannot answer; check freshness. Never rebuild/export automatically.
+For vault logging, follow AGENTS.md's verified, duplicate-safe PROGRESS/Daily capture rules; preserve the repository checklist's existing same-commit and user-confirmation requirements below.
+
 Quapp is a public community queue management app for an Android course at BISU. Queue owners (LGU staff, clinics, organizers) create public queues; queuers browse and join remotely. Wait-time forecasting (rolling average, also used to turn "I need more time" into places moved back), three anti-prank checks (grace period with "I'm here", no-show cooldown, proximity at join), several tickets per queuer (hours can't overlap), and organizer trust and safety (verified badge, reports, removals, suspension, admin web page) are in scope. SMS confirmation and the proposal's other forecasting method are future work. The data contract is `MODELS.md`.
 
 Before changing anything structural, read `DECISIONS.md` — it records why things are the way they are. `DESIGN.md` is the visual system (Civic Paper): colours, type, spacing, the ticket details and where each one goes; build every screen from it and the design canvas it links to. `PROGRESS.md` is the task list: tick items in the same commit as the work.

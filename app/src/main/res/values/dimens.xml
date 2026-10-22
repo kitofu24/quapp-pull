@@ -10,6 +10,7 @@
 
     <!-- Civic Paper radii -->
     <dimen name="radius_card">16dp</dimen>
+    <dimen name="radius_button">12dp</dimen>
     <fraction name="radius_full">50%</fraction>
     <dimen name="radius_sheet">24dp</dimen>
     <dimen name="screen_margin">24dp</dimen>
@@ -26,7 +27,7 @@
     <dimen name="card_row_height">28dp</dimen>
     <dimen name="card_hole">10dp</dimen>
     <dimen name="double_rule_height">4dp</dimen>
-    <dimen name="card_elevation">1dp</dimen>
+    <dimen name="card_elevation">0dp</dimen>
     <dimen name="banner_min_height">72dp</dimen>
     <dimen name="search_height">48dp</dimen>
     <dimen name="owner_list_bottom_padding">88dp</dimen> <!-- room for the New queue button -->
@@ -78,4 +79,29 @@
     <dimen name="icon_inset">12dp</dimen>
 
 <dimen name="space_xxl">48dp</dimen><dimen name="space_xxxl">64dp</dimen>
+    <dimen name="dimension_zero">0dp</dimen>
+    <dimen name="nav_icon_size">24dp</dimen>
+    <dimen name="nav_indicator_width">64dp</dimen>
+    <dimen name="nav_indicator_height">48dp</dimen>
+    <dimen name="focus_stroke_width">2dp</dimen>
+    <dimen name="type_104_sp">104sp</dimen>
+    <dimen name="type_112_sp">112sp</dimen>
+    <dimen name="type_119_sp">119sp</dimen>
+    <dimen name="type_132_sp">132sp</dimen>
+    <dimen name="type_144_sp">144sp</dimen>
+    <dimen name="type_16_sp">16sp</dimen>
+    <dimen name="type_160_sp">160sp</dimen>
+    <dimen name="type_17_sp">17sp</dimen>
+    <dimen name="type_18_sp">18sp</dimen>
+    <dimen name="type_20_sp">20sp</dimen>
+    <dimen name="type_21_sp">21sp</dimen>
+    <dimen name="type_22_sp">22sp</dimen>
+    <dimen name="type_24_sp">24sp</dimen>
+    <dimen name="type_26_sp">26sp</dimen>
+    <dimen name="type_29_sp">29sp</dimen>
+    <dimen name="type_36_sp">36sp</dimen>
+    <dimen name="type_44_sp">44sp</dimen>
+    <dimen name="type_53_sp">53sp</dimen>
+    <dimen name="type_54_sp">54sp</dimen>
+    <dimen name="type_56_sp">56sp</dimen>
 </resources>

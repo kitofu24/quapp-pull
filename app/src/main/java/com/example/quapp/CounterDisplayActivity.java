@@ -24,11 +24,13 @@ import java.util.List;
 public class CounterDisplayActivity extends AppCompatActivity {
 
     public static final String EXTRA_QUEUE_ID = "com.example.quapp.EXTRA_COUNTER_QUEUE_ID";
+    public static final String EXTRA_COUNTER_ID = "com.example.quapp.EXTRA_DISPLAY_COUNTER_ID";
 
     private static final long REFRESH_MS = 3_000L;
     private static final int UP_NEXT = 3;
 
     private String queueId;
+    private String counterId;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable refresh = new Runnable() {
         @Override
@@ -51,8 +53,9 @@ public class CounterDisplayActivity extends AppCompatActivity {
         SystemBars.applyPadding(findViewById(R.id.counter_root));
 
         queueId = getIntent().getStringExtra(EXTRA_QUEUE_ID);
+        counterId = getIntent().getStringExtra(EXTRA_COUNTER_ID);
         Queue queue = FakeData.queueById(queueId);
-        if (queue == null) {
+        if (queue == null || !selectedCounterAllowed()) {
             finish();
             return;
         }
@@ -90,8 +93,10 @@ public class CounterDisplayActivity extends AppCompatActivity {
             return;
         }
         // The console releases a timed-out slot when it next looks; so does the display.
+        if (!selectedCounterAllowed()) { finish(); return; }
         boolean timedOut = FakeData.checkGraceExpired(queueId);
-        Ticket serving = FakeData.nowServing(queueId);
+        Ticket serving = counterId == null ? FakeData.nowServing(queueId) : FakeData.counterServing(queueId, counterId);
+        if (counterId != null) timedOut = false;
         TextView number = findViewById(R.id.counter_number);
         TextView instruction = findViewById(R.id.counter_instruction);
         if (serving == null || timedOut) {
@@ -113,7 +118,24 @@ public class CounterDisplayActivity extends AppCompatActivity {
         TextView nextView = findViewById(R.id.counter_next);
         nextView.setText(next.length() == 0 ? getString(R.string.counter_none) : next);
 
+        String displayName = queue.getName();
+        if (counterId != null) for (QueueCounter counter : FakeData.counters(queueId)) if (counter.getId().equals(counterId)) displayName = getString(R.string.counters_display_name_format, CounterListActivity.name(this, counter), queue.getName());
         ((TextView) findViewById(R.id.counter_queue)).setText(getResources().getQuantityString(
-                R.plurals.counter_queue_waiting, waiting.size(), queue.getName(), waiting.size()));
+                R.plurals.counter_queue_waiting, waiting.size(), displayName, waiting.size()));
+        String announcement = FakeData.announcement(queueId);
+        TextView message = findViewById(R.id.counter_announcement);
+        message.setText(announcement == null ? "" : getString(R.string.announcement_display_format, announcement));
+        message.setVisibility(announcement == null ? android.view.View.GONE : android.view.View.VISIBLE);
+    }
+
+    public static Intent intent(Context context, String queueId, String counterId) {
+        return intent(context, queueId).putExtra(EXTRA_COUNTER_ID, counterId);
+    }
+
+    private boolean selectedCounterAllowed() {
+        if (counterId == null) return true;
+        if (!FakeData.ownsQueue(queueId)) return false;
+        for (QueueCounter counter : FakeData.counters(queueId)) if (counter.getId().equals(counterId)) return true;
+        return false;
     }
 }

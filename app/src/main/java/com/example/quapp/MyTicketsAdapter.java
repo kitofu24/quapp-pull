@@ -123,7 +123,8 @@ public class MyTicketsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 return context.getString(R.string.my_tickets_row_waiting_format,
                         ticket.getVenue(), ahead, ticket.getEstimatedWaitMinutes());
             case CALLED:
-                return context.getString(R.string.my_tickets_called_hint);
+                return context.getString(FakeData.arrivalConfirmed(ticket.getQueueId(), ticket.getId())
+                        ? R.string.called_waiting_completion : R.string.my_tickets_called_hint);
             default:
                 return context.getString(R.string.my_tickets_row_finished_format,
                         ticket.getVenue(), context.getString(doneLabel(ticket.getStatus())));

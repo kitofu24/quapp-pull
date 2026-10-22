@@ -47,6 +47,11 @@ public class TodayFragment extends Fragment implements TodayQueueAdapter.OnToday
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        view.findViewById(R.id.today_manage_queues).setOnClickListener(v ->
+                ((com.google.android.material.bottomnavigation.BottomNavigationView)
+                        requireActivity().findViewById(R.id.owner_home_nav))
+                        .setSelectedItemId(R.id.nav_queues));
+
         servedText = view.findViewById(R.id.today_served);
         waitingText = view.findViewById(R.id.today_waiting);
         noShowRateText = view.findViewById(R.id.today_no_show_rate);
@@ -139,7 +144,7 @@ public class TodayFragment extends Fragment implements TodayQueueAdapter.OnToday
                     emptyState.setVisibility(View.GONE);
                 } else {
                     if (getContext() != null) {
-                        com.google.android.material.snackbar.Snackbar.make(
+                        QuappMotion.snackbar(
                                 requireView(), R.string.error_default_message,
                                 com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
                     }

@@ -1,6 +1,5 @@
 package com.example.quapp;
 
-import android.animation.AnimatorInflater;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Build;
@@ -21,7 +20,8 @@ final class QuappMotion {
     private QuappMotion() { }
 
     static boolean enabled(Context context) {
-        if (context.getResources().getBoolean(R.bool.config_prefersReducedMotion)) return false;
+        if (context.getResources().getBoolean(R.bool.config_prefersReducedMotion)
+                || ProfilePreferences.get(context).getBoolean("reduced", false)) return false;
         return Build.VERSION.SDK_INT >= 26 ? ValueAnimator.areAnimatorsEnabled()
                 : Settings.Global.getFloat(context.getContentResolver(),
                         Settings.Global.ANIMATOR_DURATION_SCALE, 1f) != 0f;
@@ -29,9 +29,8 @@ final class QuappMotion {
 
     static void buttons(View view) {
         if (view instanceof MaterialButton) {
-            view.setStateListAnimator(enabled(view.getContext())
-                    ? AnimatorInflater.loadStateListAnimator(view.getContext(), R.animator.quapp_press)
-                    : null);
+            // Material's ripple already confirms presses without shrinking 48dp hit targets.
+            view.setStateListAnimator(null);
             view.setScaleX(1f);
             view.setScaleY(1f);
         }
@@ -58,8 +57,12 @@ final class QuappMotion {
     static void sheet(BottomSheetDialog sheet) {
         if (sheet.getWindow() != null) {
             sheet.getWindow().setWindowAnimations(enabled(sheet.getContext())
-                    ? R.style.Animation_Quapp_Sheet : 0);
+                    ? R.style.Animation_Quapp_Sheet : R.style.Animation_Quapp_None);
         }
+    }
+
+    static Snackbar snackbar(View anchor, int text, int duration) {
+        return snackbar(anchor, anchor.getResources().getText(text), duration);
     }
 
     static Snackbar snackbar(View anchor, CharSequence text, int duration) {

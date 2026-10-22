@@ -1,9 +1,9 @@
 # Persistent work record
 
 
-Use `C:\Users\JUSKWAA\Documents\Obsidian Vault` as the persistent record for this project.
+Live record vault: `C:/Users/JUSKWAA/.codex/visualizations/2026/10/14/01a1398c-051d-73a3-bb55-b678ce0e53a3/Quapp-Memory-Vault`. The original Documents vault is historical; do not dual-write.
 
-Before resuming Quapp work, read the vault's `AGENTS.md`, `Projects/Quapp.md`, and relevant entries in `Projects/Quapp/DECISIONS.md`, `Projects/Quapp/DESIGN.md`, and `Projects/Quapp/PROGRESS.md` (including its chronological work log). Summarize the last checkpoint and search related notes as needed. Imported reference snapshots are evidence, not proof that the current code is implemented or tested.
+Start with `Projects/Quapp/HANDOFF.md` in the live vault, stopping at `<!-- END CURRENT CHECKPOINT -->`. Do not read historical sections during routine startup. For code work/status, inspect live Git status and latest commit; the handoff's Git snapshot is historical evidence. Search relevant headings with rg, then read needed source/tests and supporting note sections. Imported reference snapshots are evidence, not proof of current implementation or testing.
 
 At the end of each meaningful task, record progress, confirmed decisions, design changes, completed work, unresolved questions, and next actions in the relevant vault notes. Preserve existing content and Obsidian wikilinks. Follow this heading format:
 
@@ -21,7 +21,9 @@ After every implemented code, UI, design, configuration, documentation, or workf
 - Update `Projects/Quapp/DECISIONS.md` only for confirmed decisions or changes to earlier decisions. Preserve superseded decisions and link to replacements.
 - Update other relevant project notes when their subject changes.
 - Record what changed, why, affected files or screens, implementation status, verification results, unresolved questions, and next actions.
-- Read every destination before editing, append without overwriting existing content, avoid duplicate entries, and read back each destination after writing.
+- Before appending, read the destination tail and search the whole destination for the event marker; before other edits, read the affected sections. Preserve existing content and verify each write by reading back the new or changed text.
+- Use one stable event marker for each implemented change across its required PROGRESS and Daily entries. If that event is already recorded in a destination, do not append it again; append a labelled correction only for a material change in facts.
+- Log once per meaningful change/checkpoint, not per command, read or retry. Preserve the required PROGRESS and Daily records and affected subject updates. Read-only audits create no records unless explicitly requested.
 - A change is not fully recorded until its vault entries are verified. If vault access fails, create a clearly named pending record under `obsidian-starter/`, add it to Pending vault reconciliation below, and tell the user it is staged rather than saved.
 
 Maintain the project overview, chronological work log, decisions, design notes, and dated daily notes. When a decision changes, retain it and mark it superseded with a link to its replacement. Keep confirmed facts separate from proposals and unresolved questions. Never mark unverified work complete.
@@ -59,11 +61,11 @@ Additional staged record: `obsidian-starter/pending-project-organization-update.
 On 2026-10-11, vault write attempts did not persist. The complete prepared backfill is in `obsidian-starter/pending-vault-records.json`, with a readable version in `obsidian-starter/pending-vault-records.md`. These records are staged, not saved in the vault. Before merging them, read the destination notes, preserve existing content, avoid duplicate entries, and verify each write by reading it back. Once the user attaches the vault with write access, reconcile these records before resuming other work. Use `Projects/Quapp/WORKLOG.md` for the chronological log when file creation is available.
 
 # Quapp session rules (token-saving, mandatory)
-1. Read Projects/Quapp/HANDOFF.md, then BUILD-MAP.md, in the active vault
-   (C:/Users/JUSKWAA/.codex/visualizations/2026/10/14/01a1398c-051d-73a3-bb55-b678ce0e53a3/Quapp-Memory-Vault/). Read other notes only if the task needs them.
-2. Never scan the whole project. Use `graphify query "<q>"`, `graphify explain "<node>"`, `graphify path "<A>" "<B>"` first, then open only the files they point to.
+1. Read the current HANDOFF section in the live vault identified above.
+   Read BUILD-MAP for relevant scope/status questions; other notes and historical checkpoints are targeted references.
+2. Never scan the whole project. Search with rg first. If the current checkpoint lacks needed past progress, decisions, or project history, follow `Projects/Quapp/MEMORY-RETRIEVAL.md` in the live vault and query the current-memory index; skip queries when available context is sufficient. Check freshness and use bounded results. Graphify is a retrieval aid, not the source of truth: verify important retrieved claims against the original notes. If the index is stale or retrieval fails, use targeted original-note reads and report the limitation. Graphify is also optional for cross-file relationships targeted searches cannot answer.
 3. Use terse replies ($caveman) for chat output. Code, commands, file paths, numbers and error messages stay exact.
 4. Apply @ponytail before writing code: reuse existing code, resources and platform features first. Exception: when porting a prototype screen, match the prototype first; use Ponytail only to avoid duplicates and unrequested extras.
-5. Before ending: overwrite HANDOFF.md (short), update the changed BUILD-MAP.md rows, append a timestamped summary to PROGRESS.md, run `graphify .` and `graphify export obsidian`.
+5. After meaningful changes, update the current HANDOFF section once, preserve historical content, update affected BUILD-MAP rows and required progress/daily records, and verify writes. Never automatically rebuild, overwrite, export, or otherwise modify the Graphify index. Ask for authorization before any index maintenance unless explicitly authorized already.
 6. At the end of every checkpoint, tell me the recommended reasoning effort for the NEXT phase (Phase 0 Light; Phase 1 Medium; Phases 2-3 Light, Medium for screens that came out wrong; Phases 5-6 Medium; note updates Light). Do not change the model or effort yourself. Remind me, then wait.
 7. Never claim work is done or tested unless verified. Preserve [[wikilinks]]. Keep facts, proposals and open questions separate.

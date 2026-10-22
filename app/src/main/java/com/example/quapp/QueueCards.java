@@ -221,7 +221,7 @@ public final class QueueCards {
             case UPCOMING:
                 label = R.string.card_opens;
                 value = context.getString(R.string.card_opens_line_format,
-                        opensText(context, queue), queue.getPeopleWaiting());
+                        opensText(context, queue));
                 break;
             default:
                 value = "";

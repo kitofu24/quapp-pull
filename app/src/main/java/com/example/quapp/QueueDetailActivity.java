@@ -170,7 +170,7 @@ public class QueueDetailActivity extends AppCompatActivity {
                     loadingStateHelper.showError(getString(R.string.error_default_message));
                     findViewById(R.id.detail_scroll).setVisibility(View.GONE);
                 } else {
-                    Snackbar.make(findViewById(R.id.detail_root), R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
+                    QuappMotion.snackbar(findViewById(R.id.detail_root), R.string.error_default_message, Snackbar.LENGTH_SHORT).show();
                     bindQueue(cachedQueue);
                     bindJoinButton(cachedQueue);
                 }
@@ -213,6 +213,13 @@ public class QueueDetailActivity extends AppCompatActivity {
             return;
         }
 
+        if (queue.getStatus() == Queue.Status.UPCOMING
+                || (queue.getStatus() == Queue.Status.OPEN && !queue.acceptsJoins())) {
+            joinButton.setText(R.string.detail_not_open_action);
+            showNotice(notice, getString(R.string.detail_not_open_notice));
+            return;
+        }
+
         if (queue.getStatus() == Queue.Status.PAUSED) {
             joinButton.setText(R.string.detail_paused_action);
             showNotice(notice, queue.getPausedAt() == null ? getString(R.string.detail_paused_notice)
@@ -246,9 +253,7 @@ public class QueueDetailActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.detail_next_number)).setText(
                 getString(R.string.ticket_number_format, FakeData.nextTicketNumber(queue.getId())));
         joinButton.setEnabled(true);
-        // Upcoming queues take joins too: you hold a number before it opens.
-        joinButton.setText(queue.getStatus() == Queue.Status.UPCOMING
-                ? R.string.detail_join_early_action : R.string.detail_join_action);
+        joinButton.setText(R.string.detail_join_action);
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -293,6 +298,8 @@ public class QueueDetailActivity extends AppCompatActivity {
             }
         });
         sheet.setContentView(content);
+        sheet.getBehavior().setMaxHeight((int) (getResources().getDisplayMetrics().heightPixels * .9f));
+        sheet.getBehavior().setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
         sheet.show();
     }
 
@@ -312,7 +319,7 @@ public class QueueDetailActivity extends AppCompatActivity {
                 }
                 if (location == null) {
                     setLocationState(LocationState.UNCHECKED);
-                    Snackbar.make(findViewById(R.id.detail_root), R.string.detail_location_failed,
+                    QuappMotion.snackbar(findViewById(R.id.detail_root), R.string.detail_location_failed,
                             Snackbar.LENGTH_LONG).setAnchorView(R.id.detail_dock).show();
                     return;
                 }
@@ -427,8 +434,16 @@ public class QueueDetailActivity extends AppCompatActivity {
     }
 
     private void bindQueue(Queue queue) {
+        com.google.android.material.button.MaterialButton save = findViewById(R.id.detail_save);
+        save.setCheckable(true);
+        SavedServices bookmarks = new SavedServices(this);
+        save.setChecked(bookmarks.contains(queue.getId()));
+        save.setText(save.isChecked() ? R.string.saved_remove : R.string.saved_save);
+        save.setIconResource(save.isChecked() ? R.drawable.ic_bookmark_filled : R.drawable.ic_bookmark);
+        save.setOnClickListener(v -> { bookmarks.toggle(queue.getId()); bindQueue(queue); });
         ((TextView) findViewById(R.id.detail_name)).setText(queue.getName());
-        ((TextView) findViewById(R.id.detail_venue)).setText(getString(R.string.browse_venue_format,
+        ((TextView) findViewById(R.id.detail_venue)).setText(java.util.Objects.equals(queue.getVenue(), queue.getMunicipality())
+                ? queue.getMunicipality() : getString(R.string.browse_venue_format,
                 queue.getVenue(), queue.getMunicipality()));
         // The serial line: the category printed like a ticket serial (the Label style caps it).
         ((TextView) findViewById(R.id.detail_category)).setText(queue.getCategory().label);
@@ -466,6 +481,7 @@ public class QueueDetailActivity extends AppCompatActivity {
      * organizer's own announcement (canvas 53). Either way, tapping it explains (52).
      */
     private void bindOrganizer(final Queue queue) {
+        findViewById(R.id.detail_public_profile).setOnClickListener(v -> startActivity(PublicOrganizerActivity.intent(this, queue.getOrganizerId())));
         ((TextView) findViewById(R.id.detail_organizer)).setText(
                 getString(R.string.detail_organized_by, queue.getOrganizerName()));
         boolean verified = queue.isOrganizerVerified();

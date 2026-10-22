@@ -47,7 +47,8 @@ public class HistoryActivity extends AppCompatActivity {
         sectionView = findViewById(R.id.history_section);
 
         list.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new HistoryAdapter();
+        ((android.widget.TextView) findViewById(R.id.history_title)).setText(R.string.profile_past_visits);
+        adapter = new HistoryAdapter(ticket -> startActivity(ProfileSettingsActivity.intent(this, "receipt").putExtra("receipt_ticket_id", ticket.getId())));
         list.setAdapter(adapter);
 
         loadingStateHelper = new LoadingStateHelper(
@@ -104,7 +105,7 @@ public class HistoryActivity extends AppCompatActivity {
                     sectionView.setVisibility(View.GONE);
                     emptyView.setVisibility(View.GONE);
                 } else {
-                    com.google.android.material.snackbar.Snackbar.make(
+                    QuappMotion.snackbar(
                             findViewById(R.id.history_root), R.string.error_default_message,
                             com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
                 }

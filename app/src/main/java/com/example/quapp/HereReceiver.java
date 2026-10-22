@@ -25,7 +25,7 @@ public class HereReceiver extends BroadcastReceiver {
             Toast.makeText(context, R.string.notification_here_too_late, Toast.LENGTH_LONG).show();
             return;
         }
-        ActiveTicketStore.markServed(ticketId);
+        ActiveTicketStore.confirmArrival(ticketId);
         Toast.makeText(context, context.getString(R.string.notification_here_done,
                 ticket.getTicketNumber()), Toast.LENGTH_LONG).show();
     }
